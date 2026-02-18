@@ -1,44 +1,16 @@
 using DG.Tweening;
-using NUnit.Framework;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    public static MenuManager instance;
-
-    [Header("Menu Panels")]
-    public GameObject mainMenuPanel;
     public List<GameObject> allPanel;
 
-    [Header("Timed Panels")]
-    public int targetSceneIndex;
-
     private Stack<GameObject> panelHistory = new Stack<GameObject>();
-
-    private void Awake()
-    {
-        if (instance == null) { instance = this; }
-
-        ShowPanel(mainMenuPanel);
-    }
-
-    public void ShowPanelFor5SecThenLoad(GameObject panel)
-    {
-        StartCoroutine(PanelTimerRoutine(panel));
-    }
-
-    private IEnumerator PanelTimerRoutine(GameObject panel)
-    {
-        ShowPanel(panel);              // Show the correct panel
-        yield return new WaitForSeconds(5f);
-        SceneManager.LoadScene(targetSceneIndex);
-    }
-
     public void ShowPanel(GameObject panelToShow)
     {
+
         foreach (GameObject panel in allPanel)
             panel.SetActive(false);
 
@@ -80,33 +52,9 @@ public class MenuManager : MonoBehaviour
             }
             else
             {
-                AnimatePanelFade(mainMenuPanel);
-                panelHistory.Push(mainMenuPanel);
+                //AnimatePanelFade(mainMenuPanel);
+                //panelHistory.Push(mainMenuPanel);
             }
-        }
-    }
-
-    public void GoBack()
-    {
-        if (panelHistory.Count > 1)
-        {
-            GameObject currect = panelHistory.Pop();
-            GameObject previous = panelHistory.Peek();
-
-            CanvasGroup currentGroup = currect.GetComponent<CanvasGroup>();
-            if (currentGroup == null)
-                currentGroup = currect.AddComponent<CanvasGroup>();
-
-            // Animate currect panel closing
-            currect.transform.DOScale(0.8f, 0.25f).SetEase(Ease.InBack);
-
-            currentGroup.DOFade(0f, 0.25f).OnComplete(() =>
-            {
-                currect.SetActive(false);
-
-                // Animate the previus panel back in
-                AnimatePanelFade(previous);
-            });
         }
     }
 
@@ -115,5 +63,3 @@ public class MenuManager : MonoBehaviour
         SceneManager.LoadScene(sceneId);
     }
 }
-
-
