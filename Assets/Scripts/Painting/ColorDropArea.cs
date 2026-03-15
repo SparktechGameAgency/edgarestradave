@@ -1,94 +1,4 @@
-﻿//////using UnityEngine;
-//////using UnityEngine.EventSystems;
-//////using UnityEngine.UI;
-
-//////public class ColorDropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
-//////{
-//////    [Header("Settings")]
-//////    public bool requireCorrectColor = false;
-//////    public Color correctColor;
-
-//////    [Header("Target Image to Color")]
-//////    public Image targetPartImage;
-
-//////    public bool IsColored { get; private set; }
-
-//////    void Start()
-//////    {
-//////        if (targetPartImage == null)
-//////            targetPartImage = GetComponent<Image>();
-
-//////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
-//////        targetPartImage.raycastTarget = true;
-//////        IsColored = false;
-//////    }
-
-//////    public void OnPointerEnter(PointerEventData eventData)
-//////    {
-//////        if (IsColored) return;
-//////        if (eventData.pointerDrag == null) return;
-
-//////        ColorDrag drag = eventData.pointerDrag.GetComponent<ColorDrag>();
-//////        if (drag == null) return;
-
-//////        targetPartImage.color = new Color(
-//////            drag.dragColor.r,
-//////            drag.dragColor.g,
-//////            drag.dragColor.b,
-//////            0.5f
-//////        );
-//////    }
-
-//////    public void OnPointerExit(PointerEventData eventData)
-//////    {
-//////        if (IsColored) return;
-//////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
-//////    }
-
-//////    public void OnDrop(PointerEventData eventData)
-//////    {
-//////        Debug.Log($"[DropArea] OnDrop called on {gameObject.name}!");
-//////        if (IsColored) return;
-
-//////        ColorDrag drag = eventData.pointerDrag?.GetComponent<ColorDrag>();
-//////        if (drag == null)
-//////        {
-//////            Debug.Log("[DropArea] drag is NULL!");
-//////            return;
-//////        }
-
-//////        if (requireCorrectColor && !ColorsMatch(drag.dragColor, correctColor))
-//////        {
-//////            Debug.Log($"[DropArea] Wrong color!");
-//////            targetPartImage.color = new Color(1f, 1f, 1f, 0f);
-//////            return;
-//////        }
-
-//////        targetPartImage.color = new Color(
-//////            drag.dragColor.r,
-//////            drag.dragColor.g,
-//////            drag.dragColor.b,
-//////            1f
-//////        );
-//////        IsColored = true;
-//////        Debug.Log($"[DropArea] SUCCESS - {gameObject.name} colored!");
-//////    }
-
-//////    private bool ColorsMatch(Color a, Color b, float tolerance = 0.1f)
-//////    {
-//////        return Mathf.Abs(a.r - b.r) < tolerance &&
-//////               Mathf.Abs(a.g - b.g) < tolerance &&
-//////               Mathf.Abs(a.b - b.b) < tolerance;
-//////    }
-
-//////    public void ResetZone()
-//////    {
-//////        IsColored = false;
-//////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
-//////    }
-//////}
-
-////using UnityEngine;
+﻿////using UnityEngine;
 ////using UnityEngine.EventSystems;
 ////using UnityEngine.UI;
 
@@ -103,28 +13,53 @@
 
 ////    public bool IsColored { get; private set; }
 
+////    // ✅ Store original sprite color
+////    private Color originalColor;
+
 ////    void Start()
 ////    {
 ////        if (targetPartImage == null)
 ////            targetPartImage = GetComponent<Image>();
 
-////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+////        // ✅ Save original color before hiding
+////        originalColor = targetPartImage.color;
+
+////        // ✅ Hide at start - keep original RGB, just set alpha=0
+////        targetPartImage.color = new Color(
+////            originalColor.r,
+////            originalColor.g,
+////            originalColor.b,
+////            0f
+////        );
+
 ////        targetPartImage.raycastTarget = true;
 ////        IsColored = false;
 ////    }
 
-////    // ✅ Called by ColorDrag every frame while hovering
 ////    public void ShowPreview(Color color)
 ////    {
 ////        if (IsColored) return;
-////        targetPartImage.color = new Color(color.r, color.g, color.b, 0.5f);
+
+////        // ✅ Show original sprite color at half opacity
+////        targetPartImage.color = new Color(
+////            originalColor.r,
+////            originalColor.g,
+////            originalColor.b,
+////            0.5f
+////        );
 ////    }
 
-////    // ✅ Called by ColorDrag when leaving this area
 ////    public void HidePreview()
 ////    {
 ////        if (IsColored) return;
-////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+
+////        // ✅ Hide back to transparent
+////        targetPartImage.color = new Color(
+////            originalColor.r,
+////            originalColor.g,
+////            originalColor.b,
+////            0f
+////        );
 ////    }
 
 ////    public void OnPointerEnter(PointerEventData eventData)
@@ -146,28 +81,23 @@
 
 ////    public void OnDrop(PointerEventData eventData)
 ////    {
-////        Debug.Log($"[DropArea] OnDrop called on {gameObject.name}!");
 ////        if (IsColored) return;
 
 ////        ColorDrag drag = eventData.pointerDrag?.GetComponent<ColorDrag>();
-////        if (drag == null)
-////        {
-////            Debug.Log("[DropArea] drag is NULL!");
-////            return;
-////        }
+////        if (drag == null) return;
 
 ////        if (requireCorrectColor && !ColorsMatch(drag.dragColor, correctColor))
 ////        {
-////            Debug.Log($"[DropArea] Wrong color!");
+////            Debug.Log($"[DropArea] Wrong color for {gameObject.name}!");
 ////            HidePreview();
 ////            return;
 ////        }
 
-////        // ✅ Lock color permanently
+////        // ✅ Reveal original sprite color fully
 ////        targetPartImage.color = new Color(
-////            drag.dragColor.r,
-////            drag.dragColor.g,
-////            drag.dragColor.b,
+////            originalColor.r,
+////            originalColor.g,
+////            originalColor.b,
 ////            1f
 ////        );
 ////        IsColored = true;
@@ -184,9 +114,32 @@
 ////    public void ResetZone()
 ////    {
 ////        IsColored = false;
-////        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+////        targetPartImage.color = new Color(
+////            originalColor.r,
+////            originalColor.g,
+////            originalColor.b,
+////            0f
+////        );
 ////    }
 ////}
+//////```
+
+//////## How It Works Now
+//////```
+//////Before game starts → sprite visible with original colors ✅
+//////Game starts        → alpha=0, sprite hidden ✅
+//////Drag over fence    → alpha=0.5, original brown shows as preview ✅
+//////Drop correct color → alpha=1, original brown fully visible ✅
+//////Drop wrong color   → alpha=0, hidden again ✅
+//////```
+
+//////## Important — Set Sprite Color in Inspector
+
+//////Before playing, make sure each sprite's **Image → Color is WHITE (1,1,1,1)**:
+//////```
+//////Fench  → Image → Color = (1,1,1,1) white ✅
+//////Grass1 → Image → Color = (1,1,1,1) white ✅
+
 
 //using UnityEngine;
 //using UnityEngine.EventSystems;
@@ -203,12 +156,22 @@
 
 //    public bool IsColored { get; private set; }
 
+//    private Color originalColor;
+
 //    void Start()
 //    {
 //        if (targetPartImage == null)
 //            targetPartImage = GetComponent<Image>();
 
-//        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+//        originalColor = targetPartImage.color;
+
+//        targetPartImage.color = new Color(
+//            originalColor.r,
+//            originalColor.g,
+//            originalColor.b,
+//            0f
+//        );
+
 //        targetPartImage.raycastTarget = true;
 //        IsColored = false;
 //    }
@@ -217,17 +180,24 @@
 //    {
 //        if (IsColored) return;
 
-//        // ✅ Only show preview if color matches (when required)
-//        if (requireCorrectColor && !ColorsMatch(color, correctColor))
-//            return;
-
-//        targetPartImage.color = new Color(color.r, color.g, color.b, 0.5f);
+//        targetPartImage.color = new Color(
+//            originalColor.r,
+//            originalColor.g,
+//            originalColor.b,
+//            0.5f
+//        );
 //    }
 
 //    public void HidePreview()
 //    {
 //        if (IsColored) return;
-//        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+
+//        targetPartImage.color = new Color(
+//            originalColor.r,
+//            originalColor.g,
+//            originalColor.b,
+//            0f
+//        );
 //    }
 
 //    public void OnPointerEnter(PointerEventData eventData)
@@ -247,6 +217,33 @@
 //        HidePreview();
 //    }
 
+//    //public void OnDrop(PointerEventData eventData)
+//    //{
+//    //    if (IsColored) return;
+
+//    //    ColorDrag drag = eventData.pointerDrag?.GetComponent<ColorDrag>();
+//    //    if (drag == null) return;
+
+//    //    if (requireCorrectColor && !ColorsMatch(drag.dragColor, correctColor))
+//    //    {
+//    //        Debug.Log($"[DropArea] Wrong color for {gameObject.name}!");
+//    //        HidePreview();
+//    //        return;
+//    //    }
+
+//    //    targetPartImage.color = new Color(
+//    //        originalColor.r,
+//    //        originalColor.g,
+//    //        originalColor.b,
+//    //        1f
+//    //    );
+//    //    IsColored = true;
+//    //    Debug.Log($"[DropArea] SUCCESS - {gameObject.name} colored!");
+
+//    //    // ✅ Check if all zones are completed
+//    //    if (GameManager.Instance != null)
+//    //        GameManager.Instance.CheckAllColored();
+//    //}
 //    public void OnDrop(PointerEventData eventData)
 //    {
 //        if (IsColored) return;
@@ -262,13 +259,17 @@
 //        }
 
 //        targetPartImage.color = new Color(
-//            drag.dragColor.r,
-//            drag.dragColor.g,
-//            drag.dragColor.b,
+//            originalColor.r,
+//            originalColor.g,
+//            originalColor.b,
 //            1f
 //        );
 //        IsColored = true;
 //        Debug.Log($"[DropArea] SUCCESS - {gameObject.name} colored!");
+
+//        // ✅ Tell GameManager one zone is done
+//        if (GameManager.Instance != null)
+//            GameManager.Instance.OnZoneColored();
 //    }
 
 //    private bool ColorsMatch(Color a, Color b, float tolerance = 0.1f)
@@ -281,24 +282,43 @@
 //    public void ResetZone()
 //    {
 //        IsColored = false;
-//        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+//        targetPartImage.color = new Color(
+//            originalColor.r,
+//            originalColor.g,
+//            originalColor.b,
+//            0f
+//        );
 //    }
 //}
 ////```
 
-////## Result
+////## Unity Setup For Congrats Panel
 ////```
-////Drag fence color over grass  → grass pixel check passes
-////                             → ShowPreview called
-////                             → requireCorrectColor = true
-////                             → colors don't match → NO preview ✅
+////Canvas
+////  └── CongratsPanel          ← assign to GameManager.congratsPanel
+////        ├── Background        (dark semi-transparent)
+////        ├── CongratsImage     ← assign to GameManager.congratsImage
+////        │    (pulsing colored picture)
+////        ├── Text "🎉 Congratulations! 🎉"
+////        └── CloseButton       → OnClick → GameManager.CloseCurrectPanel()
+////```
 
-////Drag fence color over fence  → fence pixel check passes  
-////                             → ShowPreview called
-////                             → colors match → preview shown ✅
+////**GameManager Inspector:**
+////```
+////Congrats Panel        → CongratsPanel GameObject
+////Congrats Image        → CongratsImage component
+////Original Colored Sprite → your colored reference PNG
+////```
 
-////Drop fence color on fence    → SUCCESS ✅
-////Drop fence color on grass    → Wrong color → nothing happens ✅
+////## How It Works
+////```
+////Last zone colored → CheckAllColored() → all IsColored=true
+////                 → ShowCongrats()
+////                 → Panel bounces in ✅
+////                 → Image pulses forever ✅
+////Close button     → CloseCurrectPanel()
+////                 → Pulse stops ✅
+////                 → Panel shrinks out ✅
 ///
 
 using UnityEngine;
@@ -316,12 +336,22 @@ public class ColorDropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
 
     public bool IsColored { get; private set; }
 
+    private Color originalColor;
+
     void Start()
     {
         if (targetPartImage == null)
             targetPartImage = GetComponent<Image>();
 
-        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+        originalColor = targetPartImage.color;
+
+        targetPartImage.color = new Color(
+            originalColor.r,
+            originalColor.g,
+            originalColor.b,
+            0f
+        );
+
         targetPartImage.raycastTarget = true;
         IsColored = false;
     }
@@ -329,15 +359,23 @@ public class ColorDropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
     public void ShowPreview(Color color)
     {
         if (IsColored) return;
-
-        // ✅ Always show preview for any color
-        targetPartImage.color = new Color(color.r, color.g, color.b, 0.5f);
+        targetPartImage.color = new Color(
+            originalColor.r,
+            originalColor.g,
+            originalColor.b,
+            0.5f
+        );
     }
 
     public void HidePreview()
     {
         if (IsColored) return;
-        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+        targetPartImage.color = new Color(
+            originalColor.r,
+            originalColor.g,
+            originalColor.b,
+            0f
+        );
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -364,23 +402,25 @@ public class ColorDropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
         ColorDrag drag = eventData.pointerDrag?.GetComponent<ColorDrag>();
         if (drag == null) return;
 
-        // ✅ Only lock color if correct color dropped
         if (requireCorrectColor && !ColorsMatch(drag.dragColor, correctColor))
         {
             Debug.Log($"[DropArea] Wrong color for {gameObject.name}!");
-            HidePreview(); // ✅ Hide preview on wrong drop
+            HidePreview();
             return;
         }
 
-        // ✅ Correct color - lock permanently
         targetPartImage.color = new Color(
-            drag.dragColor.r,
-            drag.dragColor.g,
-            drag.dragColor.b,
+            originalColor.r,
+            originalColor.g,
+            originalColor.b,
             1f
         );
         IsColored = true;
         Debug.Log($"[DropArea] SUCCESS - {gameObject.name} colored!");
+
+        // ✅ Notify GameManager
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnZoneColored();
     }
 
     private bool ColorsMatch(Color a, Color b, float tolerance = 0.1f)
@@ -393,6 +433,57 @@ public class ColorDropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, 
     public void ResetZone()
     {
         IsColored = false;
-        targetPartImage.color = new Color(1f, 1f, 1f, 0f);
+        targetPartImage.color = new Color(
+            originalColor.r,
+            originalColor.g,
+            originalColor.b,
+            0f
+        );
     }
 }
+//```
+
+//---
+
+//## Inspector Setup
+
+//**GameManager:**
+//```
+//Congrats Panel    → your CongratsPanel GameObject
+//Pulsing Object    → any GameObject (image/star/character)
+
+//All Drop Areas (15):
+//  Element 0  → Fench
+//  Element 1  → Grass1
+//  Element 2  → Grass2
+//  Element 3  → Grass3
+//  Element 4  → Grass4
+//  Element 5  → Sky
+//  Element 6  → Trees
+//  Element 7  → House
+//  Element 8  → Cows
+//  Element 9  → BrownCow
+//  Element 10 → WhiteCow
+//  Element 11 → (add remaining)
+//  Element 12 → ...
+//  Element 13 → ...
+//  Element 14 → ...
+//```
+
+//To add them quickly:
+//```
+//Click lock icon 🔒 on Inspector
+//Select all 15 GameObjects in Hierarchy
+//Drag them all into "All Drop Areas" list at once
+//```
+
+//## How It Works
+//```
+//Game starts     → coloredCount = 0, panel hidden ✅
+//Color 1 done    → coloredCount = 1  (1/15) ✅
+//Color 2 done    → coloredCount = 2  (2/15) ✅
+//...
+//Color 15 done   → coloredCount = 15 (15/15)
+//                → CongratsPanel appears! 🎉
+//                → PulsingObject bounces forever! 💫
+//Close button    → panel hides, pulse stops ✅
