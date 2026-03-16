@@ -209,121 +209,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: front2
   repairedPartImage: {fileID: 177216105}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
---- !u!1 &210918338
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 210918341}
-  - component: {fileID: 210918340}
-  - component: {fileID: 210918339}
-  m_Layer: 0
-  m_Name: DogIdle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!95 &210918339
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 210918338}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0789ffc9aa00ad548b3b6b6779a4f21d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!212 &210918340
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 210918338}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: -7279893773965619476, guid: 7c7c1543e80a6a346a5c7f0ea2e9d9aa, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 2.62, y: 5.14}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!4 &210918341
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 210918338}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &496419840
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,6 +222,7 @@ GameObject:
   - component: {fileID: 496419843}
   - component: {fileID: 496419842}
   - component: {fileID: 496419841}
+  - component: {fileID: 496419844}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -416,6 +304,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &496419844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496419840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &503882100
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: front1
   repairedPartImage: {fileID: 580261773}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
 --- !u!1 &655106826
 GameObject:
@@ -923,6 +856,7 @@ RectTransform:
   - {fileID: 842007873}
   - {fileID: 509240161}
   - {fileID: 2036611093}
+  - {fileID: 1365732518}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1249,6 +1183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: engine
   repairedPartImage: {fileID: 943198759}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
 --- !u!1 &1064750696
 GameObject:
@@ -1674,7 +1609,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1712,6 +1647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: body
   repairedPartImage: {fileID: 1306908568}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
 --- !u!1 &1318542578
 GameObject:
@@ -2007,6 +1943,139 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1352452653}
   m_CullTransparentMesh: 1
+--- !u!1 &1365732517
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1365732518}
+  - component: {fileID: 1365732521}
+  - component: {fileID: 1365732520}
+  - component: {fileID: 1365732522}
+  m_Layer: 5
+  m_Name: DogAnimController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1365732518
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365732517}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 811368054}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -36, y: -96}
+  m_SizeDelta: {x: 334, y: 514}
+  m_Pivot: {x: 1, y: 0}
+--- !u!114 &1365732520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365732517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 7e0bb7ec61faa6d44a0c15fb642f9a96, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1365732521
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365732517}
+  m_CullTransparentMesh: 1
+--- !u!114 &1365732522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1365732517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d97f11ca125333247b805b7126e97c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DogAnimationController
+  idleFrames:
+  - {fileID: 21300000, guid: 7c7c1543e80a6a346a5c7f0ea2e9d9aa, type: 3}
+  - {fileID: 21300000, guid: e4bb8906b8756c54db71a8248ae7df28, type: 3}
+  - {fileID: 21300000, guid: 3af88864b244e5044ac2458d02767091, type: 3}
+  - {fileID: 21300000, guid: 7e0bb7ec61faa6d44a0c15fb642f9a96, type: 3}
+  - {fileID: 21300000, guid: 6774966c0e791ff4b83998b787056b26, type: 3}
+  - {fileID: 21300000, guid: 457827ec3cb78584898df4ddb98004aa, type: 3}
+  - {fileID: 21300000, guid: 50aa6eab3c27ce945a4edfcc0110395e, type: 3}
+  - {fileID: 21300000, guid: b1a210005e7c795459d32f2c067b2c97, type: 3}
+  - {fileID: 21300000, guid: 0058f886fc9674043b84761106880cff, type: 3}
+  - {fileID: 21300000, guid: 620a5ceb59e137d4aa18a34c6b9248f9, type: 3}
+  - {fileID: 21300000, guid: e3437ca97064f2e428f8765f425b5a28, type: 3}
+  - {fileID: 21300000, guid: 88849cc39e65b3046a10e83d1745ea21, type: 3}
+  - {fileID: 21300000, guid: 742f197d9f8adb641831c3b2f38ccfd8, type: 3}
+  - {fileID: 21300000, guid: 71d25afcce564fa4ca4848618078eaee, type: 3}
+  - {fileID: 21300000, guid: cbddbc186b798f040888d5436589a18d, type: 3}
+  - {fileID: 21300000, guid: d00f74d6933b1ed4ab7b653682d4b13e, type: 3}
+  - {fileID: 21300000, guid: b25822800a905d44fb05b630fc09e7cd, type: 3}
+  - {fileID: 21300000, guid: 80cf6d5a2cd8e604c87f1dfae7578551, type: 3}
+  - {fileID: 21300000, guid: 9cfc94f03a7ec6d4bb538298685acc05, type: 3}
+  - {fileID: 21300000, guid: 80b456763b629534d9e9285d6c9d2d88, type: 3}
+  - {fileID: 21300000, guid: 9e4db3c78a95a274aa95065c59cf3106, type: 3}
+  - {fileID: 21300000, guid: 200381de34c2e0645b009e73e452a038, type: 3}
+  idleFPS: 8
+  wrongFrames:
+  - {fileID: -3994744024693093290, guid: 86f8a0eb2ff46634c9e94455046ac14f, type: 3}
+  - {fileID: 3870582607253728757, guid: 31319b856f8dda846a7a39b96fe4ede0, type: 3}
+  - {fileID: -3167751931253912626, guid: 5a9b43237b9420246b703ac3548399c3, type: 3}
+  - {fileID: -5185832707667426842, guid: d043b1211be4e094aae5ed8ce34608d0, type: 3}
+  - {fileID: -2540622767991212482, guid: f65ab34802032f9479d213de410e3f86, type: 3}
+  - {fileID: 8968001586747014694, guid: 35123f11cfcb5854a839d38e7a0453ab, type: 3}
+  wrongFPS: 8
+  congratsFrames:
+  - {fileID: 21300000, guid: bb8c1505ac555e04daececcbe0c10883, type: 3}
+  - {fileID: 21300000, guid: 6972db4b440feee4281cdbca4de1776b, type: 3}
+  - {fileID: 21300000, guid: dc4be0db308111e4a83538226fcb301f, type: 3}
+  - {fileID: 21300000, guid: c1b6b3769ae2ce249819d4774b3e99c0, type: 3}
+  - {fileID: 21300000, guid: c067ae676257b3e43a66fcefc7c6aa99, type: 3}
+  - {fileID: 21300000, guid: b77fe654d15fdfd48a5bf38964e9240d, type: 3}
+  - {fileID: 21300000, guid: 813b92eff1cc9894592075e504c32786, type: 3}
+  - {fileID: 21300000, guid: c2b8b066be1f7f84db1b3abbf0b8cf77, type: 3}
+  - {fileID: 21300000, guid: bdd8c1c27f1a44b4fae49d80e7dccf5f, type: 3}
+  - {fileID: 21300000, guid: 685d4510430b3564885c8b74b617b874, type: 3}
+  - {fileID: 21300000, guid: 97cb45a2b97024645b9dc527e2b45603, type: 3}
+  congratsFPS: 10
 --- !u!1 &1426967677
 GameObject:
   m_ObjectHideFlags: 0
@@ -2082,120 +2151,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1426967677}
   m_CullTransparentMesh: 1
---- !u!1 &1507767139
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1507767142}
-  - component: {fileID: 1507767141}
-  - component: {fileID: 1507767140}
-  m_Layer: 0
-  m_Name: DogWrong
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!95 &1507767140
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1507767139}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: a13ac822de130104cbcc23eff8aab835, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!212 &1507767141
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1507767139}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: 3870582607253728757, guid: 31319b856f8dda846a7a39b96fe4ede0, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 2.62, y: 5.14}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!4 &1507767142
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1507767139}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.34, y: -3.69, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1539873025
 GameObject:
   m_ObjectHideFlags: 0
@@ -2333,8 +2288,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1562.7687, y: 1147.0765}
+  m_AnchoredPosition: {x: 0, y: 0.000030517578}
+  m_SizeDelta: {x: 1562.7687, y: 1147.0767}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1608362992
 MonoBehaviour:
@@ -2349,7 +2304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2388,6 +2343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: exhaust
   repairedPartImage: {fileID: 1608362992}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
 --- !u!1 &1609073592
 GameObject:
@@ -2569,6 +2525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RepairSlot
   requiredPartID: backwheel
   repairedPartImage: {fileID: 1661245151}
+  dogController: {fileID: 1365732522}
   isRepaired: 0
 --- !u!1 &1863244378
 GameObject:
@@ -2602,14 +2559,15 @@ MonoBehaviour:
   allPanel: []
   congratsPanel: {fileID: 2036611092}
   pulsingObject: {fileID: 1984590062}
+  dogController: {fileID: 1365732522}
   allDropAreas: []
   allRepairSlots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1608362994}
+  - {fileID: 1306908570}
+  - {fileID: 177216107}
+  - {fileID: 943198761}
+  - {fileID: 580261775}
+  - {fileID: 1661245153}
 --- !u!4 &1863244380
 Transform:
   m_ObjectHideFlags: 0
@@ -2920,7 +2878,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 496419843}
   - {fileID: 811368054}
-  - {fileID: 1507767142}
   - {fileID: 821572586}
   - {fileID: 1863244380}
-  - {fileID: 210918341}
