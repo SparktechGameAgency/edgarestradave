@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 13996125}
   - component: {fileID: 13996124}
   - component: {fileID: 13996123}
+  - component: {fileID: 13996127}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -175,7 +176,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 13996122}
   mouthTarget: {fileID: 1580108360}
@@ -299,6 +300,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 13996121}
   m_CullTransparentMesh: 1
+--- !u!114 &13996127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 13996121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &36636908
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +352,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -73}
-  m_SizeDelta: {x: 90, y: 40}
+  m_SizeDelta: {x: 220, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &36636910
 MonoBehaviour:
@@ -549,8 +565,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -73}
-  m_SizeDelta: {x: 90, y: 40}
+  m_AnchoredPosition: {x: 0, y: -130}
+  m_SizeDelta: {x: 220, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &42972498
 MonoBehaviour:
@@ -868,6 +884,7 @@ GameObject:
   - component: {fileID: 62452383}
   - component: {fileID: 62452382}
   - component: {fileID: 62452381}
+  - component: {fileID: 62452385}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -911,7 +928,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 62452380}
   mouthTarget: {fileID: 1580108360}
@@ -1035,6 +1052,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62452379}
   m_CullTransparentMesh: 1
+--- !u!114 &62452385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62452379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &89329161
 GameObject:
   m_ObjectHideFlags: 0
@@ -1048,6 +1080,7 @@ GameObject:
   - component: {fileID: 89329165}
   - component: {fileID: 89329164}
   - component: {fileID: 89329163}
+  - component: {fileID: 89329167}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -1215,6 +1248,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89329161}
   m_CullTransparentMesh: 1
+--- !u!114 &89329167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 89329161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &111679595
 GameObject:
   m_ObjectHideFlags: 0
@@ -1249,8 +1297,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 290, y: 40}
+  m_AnchoredPosition: {x: 0, y: 50}
+  m_SizeDelta: {x: 600, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &111679597
 MonoBehaviour:
@@ -1415,7 +1463,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &157344401
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1424,15 +1472,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157344400}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.0000945}
-  m_LocalScale: {x: 174.55556, y: 291.54843, z: 230.27396}
+  m_LocalPosition: {x: 0, y: 0, z: 3166.9}
+  m_LocalScale: {x: 526.3374, y: 879.106, z: 694.3451}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1344343675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 322.13, y: -32.457}
+  m_AnchoredPosition: {x: 901.27, y: -158}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &157344402
@@ -1760,8 +1808,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000038146973, y: 30.300003}
-  m_SizeDelta: {x: 300, y: 50}
+  m_AnchoredPosition: {x: -0.0000038146973, y: 60}
+  m_SizeDelta: {x: 800, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &232493612
 MonoBehaviour:
@@ -1838,7 +1886,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 250, y: 300}
+  m_SizeDelta: {x: 900, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &288172480
 MonoBehaviour:
@@ -2232,14 +2280,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1747891471}
+  m_Children: []
   m_Father: {fileID: 2099826005}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0.25076}
-  m_SizeDelta: {x: 881, y: 349.5}
+  m_SizeDelta: {x: 3000, y: 1500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &490773466
 MonoBehaviour:
@@ -2443,8 +2490,8 @@ Transform:
   m_GameObject: {fileID: 496054149}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 322.12692, y: -32.456997, z: -3140.9998}
-  m_LocalScale: {x: 48.859997, y: 48.859997, z: 48.859997}
+  m_LocalPosition: {x: 901.26, y: -158, z: -6301}
+  m_LocalScale: {x: 147.32755, y: 147.32755, z: 147.32755}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1344343675}
@@ -3128,8 +3175,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 55.2, y: -100.8}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchoredPosition: {x: 162, y: -300}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &690667308
 MonoBehaviour:
@@ -3399,7 +3446,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: -74.104}
+  m_AnchoredPosition: {x: -228, y: -359}
   m_SizeDelta: {x: 12, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &846396492
@@ -3686,8 +3733,8 @@ Transform:
   m_GameObject: {fileID: 913381745}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 322.12692, y: -32.456997, z: -3140.9998}
-  m_LocalScale: {x: 48.859997, y: 48.859997, z: 48.859997}
+  m_LocalPosition: {x: 901.26, y: -158, z: -6301}
+  m_LocalScale: {x: 147.32755, y: 147.32755, z: 147.32755}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1344343675}
@@ -3705,6 +3752,7 @@ GameObject:
   - component: {fileID: 944629946}
   - component: {fileID: 944629945}
   - component: {fileID: 944629944}
+  - component: {fileID: 944629948}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -3748,7 +3796,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 944629943}
   mouthTarget: {fileID: 1580108360}
@@ -3872,6 +3920,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 944629942}
   m_CullTransparentMesh: 1
+--- !u!114 &944629948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 944629942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1038211471
 GameObject:
   m_ObjectHideFlags: 0
@@ -3974,6 +4037,7 @@ GameObject:
   - component: {fileID: 1105200266}
   - component: {fileID: 1105200265}
   - component: {fileID: 1105200264}
+  - component: {fileID: 1105200268}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -4141,6 +4205,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1105200262}
   m_CullTransparentMesh: 1
+--- !u!114 &1105200268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1105200262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1189027696
 GameObject:
   m_ObjectHideFlags: 0
@@ -4208,6 +4287,7 @@ GameObject:
   - component: {fileID: 1190614251}
   - component: {fileID: 1190614250}
   - component: {fileID: 1190614249}
+  - component: {fileID: 1190614253}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -4375,6 +4455,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1190614247}
   m_CullTransparentMesh: 1
+--- !u!114 &1190614253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190614247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1254225839
 GameObject:
   m_ObjectHideFlags: 0
@@ -4483,8 +4578,8 @@ Transform:
   m_GameObject: {fileID: 1254225839}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 322.12692, y: -32.456997, z: -3140.9998}
-  m_LocalScale: {x: 48.859997, y: 48.859997, z: 48.859997}
+  m_LocalPosition: {x: 901.26, y: -158, z: -6301}
+  m_LocalScale: {x: 147.32755, y: 147.32755, z: 147.32755}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1344343675}
@@ -4502,6 +4597,7 @@ GameObject:
   - component: {fileID: 1263236524}
   - component: {fileID: 1263236523}
   - component: {fileID: 1263236522}
+  - component: {fileID: 1263236526}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -4669,6 +4765,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1263236520}
   m_CullTransparentMesh: 1
+--- !u!114 &1263236526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263236520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1296813835
 GameObject:
   m_ObjectHideFlags: 0
@@ -4682,6 +4793,7 @@ GameObject:
   - component: {fileID: 1296813839}
   - component: {fileID: 1296813838}
   - component: {fileID: 1296813837}
+  - component: {fileID: 1296813841}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -4725,7 +4837,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 1296813836}
   mouthTarget: {fileID: 1580108360}
@@ -4849,6 +4961,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296813835}
   m_CullTransparentMesh: 1
+--- !u!114 &1296813841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296813835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1335460428
 GameObject:
   m_ObjectHideFlags: 0
@@ -5354,6 +5481,7 @@ GameObject:
   - component: {fileID: 1384926801}
   - component: {fileID: 1384926800}
   - component: {fileID: 1384926799}
+  - component: {fileID: 1384926803}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -5397,7 +5525,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 1384926798}
   mouthTarget: {fileID: 1580108360}
@@ -5521,6 +5649,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1384926797}
   m_CullTransparentMesh: 1
+--- !u!114 &1384926803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384926797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1387264403
 GameObject:
   m_ObjectHideFlags: 0
@@ -5613,6 +5756,7 @@ GameObject:
   - component: {fileID: 1453966394}
   - component: {fileID: 1453966393}
   - component: {fileID: 1453966392}
+  - component: {fileID: 1453966396}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -5780,6 +5924,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1453966390}
   m_CullTransparentMesh: 1
+--- !u!114 &1453966396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453966390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1484645510
 GameObject:
   m_ObjectHideFlags: 0
@@ -5793,6 +5952,7 @@ GameObject:
   - component: {fileID: 1484645514}
   - component: {fileID: 1484645513}
   - component: {fileID: 1484645512}
+  - component: {fileID: 1484645516}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -5960,6 +6120,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484645510}
   m_CullTransparentMesh: 1
+--- !u!114 &1484645516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484645510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1508965625
 GameObject:
   m_ObjectHideFlags: 0
@@ -6009,6 +6184,7 @@ GameObject:
   - component: {fileID: 1509335220}
   - component: {fileID: 1509335219}
   - component: {fileID: 1509335218}
+  - component: {fileID: 1509335222}
   m_Layer: 5
   m_Name: Food 1
   m_TagString: Untagged
@@ -6052,7 +6228,7 @@ MonoBehaviour:
   extraAnim: {fileID: 1254225839}
   foodType: chili
   isSpicy: 1
-  eatDuration: 2
+  eatDuration: 1
   extraDuration: 2
   foodObject: {fileID: 1509335217}
   mouthTarget: {fileID: 1580108360}
@@ -6176,6 +6352,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1509335216}
   m_CullTransparentMesh: 1
+--- !u!114 &1509335222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1509335216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1539946050
 GameObject:
   m_ObjectHideFlags: 0
@@ -6203,15 +6394,15 @@ RectTransform:
   m_GameObject: {fileID: 1539946050}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.000013990868}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1508965626}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -9.3132e-10, y: 0}
-  m_SizeDelta: {x: 1.6, y: 1.5999985}
+  m_AnchoredPosition: {x: -9.3132e-10, y: 0.35}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1539946052
 MonoBehaviour:
@@ -6337,15 +6528,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580108359}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3140.9998}
-  m_LocalScale: {x: 34.899998, y: 34.899998, z: 34.899998}
+  m_LocalPosition: {x: 0, y: 0, z: -6301}
+  m_LocalScale: {x: 105.23396, y: 105.23396, z: 105.23396}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1344343675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 322, y: 2}
+  m_AnchoredPosition: {x: 900.87305, y: -54.099995}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1597387092
@@ -6361,6 +6552,7 @@ GameObject:
   - component: {fileID: 1597387096}
   - component: {fileID: 1597387095}
   - component: {fileID: 1597387094}
+  - component: {fileID: 1597387098}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -6528,6 +6720,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1597387092}
   m_CullTransparentMesh: 1
+--- !u!114 &1597387098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1597387092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1638892750
 GameObject:
   m_ObjectHideFlags: 0
@@ -6703,6 +6910,7 @@ GameObject:
   - component: {fileID: 1638976576}
   - component: {fileID: 1638976575}
   - component: {fileID: 1638976574}
+  - component: {fileID: 1638976578}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -6870,6 +7078,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1638976572}
   m_CullTransparentMesh: 1
+--- !u!114 &1638976578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1638976572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1647416456
 GameObject:
   m_ObjectHideFlags: 0
@@ -6906,8 +7129,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -55, y: -100.8}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchoredPosition: {x: -177, y: -300}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1647416458
 MonoBehaviour:
@@ -7065,7 +7288,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 450, y: 350}
+  m_SizeDelta: {x: 1300, y: 1100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1688591265
 MonoBehaviour:
@@ -7211,85 +7434,6 @@ MonoBehaviour:
   wobbleAngle: 8
   wobbleSpeed: 18
   wobbleDuration: 0.5
---- !u!1 &1747891470
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1747891471}
-  - component: {fileID: 1747891473}
-  - component: {fileID: 1747891472}
-  m_Layer: 5
-  m_Name: Text (Legacy)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1747891471
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1747891470}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 490773465}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1747891472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1747891470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
-    m_Alignment: 4
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: Button
---- !u!222 &1747891473
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1747891470}
-  m_CullTransparentMesh: 1
 --- !u!1 &1765307900
 GameObject:
   m_ObjectHideFlags: 0
@@ -7303,6 +7447,7 @@ GameObject:
   - component: {fileID: 1765307904}
   - component: {fileID: 1765307903}
   - component: {fileID: 1765307902}
+  - component: {fileID: 1765307906}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -7470,6 +7615,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1765307900}
   m_CullTransparentMesh: 1
+--- !u!114 &1765307906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765307900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1813446643
 GameObject:
   m_ObjectHideFlags: 0
@@ -7537,6 +7697,7 @@ GameObject:
   - component: {fileID: 1825201748}
   - component: {fileID: 1825201747}
   - component: {fileID: 1825201746}
+  - component: {fileID: 1825201750}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -7704,6 +7865,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1825201744}
   m_CullTransparentMesh: 1
+--- !u!114 &1825201750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825201744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1946558003
 GameObject:
   m_ObjectHideFlags: 0
@@ -7717,6 +7893,7 @@ GameObject:
   - component: {fileID: 1946558007}
   - component: {fileID: 1946558006}
   - component: {fileID: 1946558005}
+  - component: {fileID: 1946558009}
   m_Layer: 5
   m_Name: Food 3
   m_TagString: Untagged
@@ -7884,6 +8061,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946558003}
   m_CullTransparentMesh: 1
+--- !u!114 &1946558009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946558003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &1966108715
 GameObject:
   m_ObjectHideFlags: 0
@@ -7919,7 +8111,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -16.28}
-  m_SizeDelta: {x: 458.52, y: 227.04}
+  m_SizeDelta: {x: 1000, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1966108717
 MonoBehaviour:
@@ -7994,7 +8186,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -16.28}
-  m_SizeDelta: {x: 458.52, y: 227.04}
+  m_SizeDelta: {x: 1000, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1978912289
 MonoBehaviour:
@@ -8405,7 +8597,7 @@ Transform:
   m_GameObject: {fileID: 2046313332}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3140.9998}
+  m_LocalPosition: {x: 578.87305, y: 0, z: -3140.9998}
   m_LocalScale: {x: 34.899998, y: 34.899998, z: 34.899998}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8490,8 +8682,8 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067291961}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3937438, y: 1.0619, z: 1.0619}
+  m_LocalPosition: {x: 0, y: 0, z: 3169.9}
+  m_LocalScale: {x: 4.2025557, y: 3.2019472, z: 3.2019472}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1038211472}
@@ -8499,7 +8691,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 206.5, y: 101}
+  m_AnchoredPosition: {x: 552.61, y: 244.41002}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2067291963
@@ -8590,7 +8782,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 2.61, y: -15.215}
-  m_SizeDelta: {x: 120, y: 30.43}
+  m_SizeDelta: {x: 300, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2076174498
 MonoBehaviour:
@@ -8643,6 +8835,7 @@ GameObject:
   - component: {fileID: 2091245975}
   - component: {fileID: 2091245974}
   - component: {fileID: 2091245973}
+  - component: {fileID: 2091245977}
   m_Layer: 5
   m_Name: Food 2
   m_TagString: Untagged
@@ -8810,6 +9003,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2091245971}
   m_CullTransparentMesh: 1
+--- !u!114 &2091245977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091245971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cccecccf05644c7a969e4976cfe24a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PulseAnimation
+  minScale: 0.9
+  maxScale: 1.1
+  speed: 2
 --- !u!1 &2099826002
 GameObject:
   m_ObjectHideFlags: 0
