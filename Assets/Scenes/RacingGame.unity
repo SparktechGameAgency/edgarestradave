@@ -1396,8 +1396,8 @@ MonoBehaviour:
   - {fileID: 995465660}
   - {fileID: 245620338}
   - {fileID: 1854082490}
-  spawnInterval: 2
-  totalCarsToSpawn: 1
+  spawnInterval: 4
+  totalCarsToSpawn: 5
   playerObject: {fileID: 890710599}
   gameOverPanel: {fileID: 1097604664}
   roadLines:
@@ -2209,7 +2209,7 @@ GameObject:
   - component: {fileID: 1097604665}
   - component: {fileID: 1097604667}
   - component: {fileID: 1097604666}
-  - component: {fileID: 1097604668}
+  - component: {fileID: 1097604669}
   m_Layer: 0
   m_Name: GameOver
   m_TagString: Untagged
@@ -2276,7 +2276,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1097604664}
   m_CullTransparentMesh: 1
---- !u!114 &1097604668
+--- !u!114 &1097604669
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2287,7 +2287,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a525f1d84c91f453b92964c1a943ef95, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameOverPanel
+  m_EditorClassIdentifier: Assembly-CSharp::YouWinPanel
+  popSpeed: 3
+  overshootScale: 1
 --- !u!1 &1180442882
 GameObject:
   m_ObjectHideFlags: 0
@@ -3184,8 +3186,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2105565751}
-        m_TargetAssemblyTypeName: GameOverPanel, Assembly-CSharp
+      - m_Target: {fileID: 2105565755}
+        m_TargetAssemblyTypeName: YouWinPanel, Assembly-CSharp
         m_MethodName: OnRestartButton
         m_Mode: 1
         m_Arguments:
@@ -4173,9 +4175,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1097604668}
+      - m_Target: {fileID: 1097604664}
         m_TargetAssemblyTypeName: GameOverPanel, Assembly-CSharp
-        m_MethodName: OnRestartButton
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4573,8 +4575,7 @@ GameObject:
   - component: {fileID: 2105565750}
   - component: {fileID: 2105565753}
   - component: {fileID: 2105565752}
-  - component: {fileID: 2105565751}
-  - component: {fileID: 2105565754}
+  - component: {fileID: 2105565755}
   m_Layer: 0
   m_Name: YouWin
   m_TagString: Untagged
@@ -4604,18 +4605,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2105565751
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105565749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a525f1d84c91f453b92964c1a943ef95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameOverPanel
 --- !u!114 &2105565752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4654,7 +4643,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2105565749}
   m_CullTransparentMesh: 1
---- !u!114 &2105565754
+--- !u!114 &2105565755
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4665,7 +4654,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a525f1d84c91f453b92964c1a943ef95, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameOverPanel
+  m_EditorClassIdentifier: Assembly-CSharp::YouWinPanel
+  popSpeed: 5
+  overshootScale: 1.2
 --- !u!1 &2121634708
 GameObject:
   m_ObjectHideFlags: 0
