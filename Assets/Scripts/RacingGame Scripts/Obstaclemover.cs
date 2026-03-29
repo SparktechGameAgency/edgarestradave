@@ -14,13 +14,8 @@ public class ObstacleMover : MonoBehaviour
     [Header("Speed")]
     public float speed = 0.3f;
 
-    [Header("Player")]
-    public RectTransform playerObject;
-
-    [Header("Game Over")]
-    public GameObject gameOverPanel;
-
-    // Callback to notify CarSpawnManager when car finishes
+    [HideInInspector] public RectTransform playerObject;
+    [HideInInspector] public GameObject gameOverPanel;
     [HideInInspector] public Action onCarFinished;
 
     private RectTransform rectTransform;
@@ -57,13 +52,12 @@ public class ObstacleMover : MonoBehaviour
         float currentScale   = Mathf.Lerp(startScale, endScale, progress);
         transform.localScale = Vector3.one * currentScale;
 
-        CheckCollision();
+        // Only check collision when car is close to player (progress > 0.75)
+        if (progress > 0.75f)
+            CheckCollision();
 
-        // Car finished — notify manager
         if (progress >= 1f)
-        {
             onCarFinished?.Invoke();
-        }
     }
 
     void CheckCollision()
