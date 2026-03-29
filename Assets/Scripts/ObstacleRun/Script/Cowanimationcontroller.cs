@@ -1,23 +1,1472 @@
-﻿////using UnityEngine;
+﻿////////////////using UnityEngine;
+////////////////using UnityEngine.UI;
+////////////////using System.Collections;
+
+////////////////public class Cowanimationcontroller : MonoBehaviour
+////////////////{
+////////////////    public enum CowState { Idle, SideRun, Jump, Hit, Win }
+
+////////////////    [Header("Movement")]
+////////////////    public float moveSpeed = 500f;
+
+////////////////    [Header("Animations")]
+////////////////    public Sprite[] idleFrames;
+////////////////    public Sprite[] runFrames;
+////////////////    public Sprite[] jumpFrames;
+////////////////    public Sprite[] hitFrames;
+////////////////    public Sprite[] winFrames;
+
+////////////////    public float fps = 12f;
+
+////////////////    private Image cowImage;
+////////////////    private RectTransform cowRect;
+
+////////////////    private CowState currentState;
+
+////////////////    private bool isRunning = false;
+////////////////    private bool isJumping = false;   // ✅ FIX: prevent loop
+
+////////////////    [HideInInspector] public float worldX = 0f;
+
+////////////////    void Start()
+////////////////    {
+////////////////        cowImage = GetComponent<Image>();
+////////////////        cowRect = GetComponent<RectTransform>();
+
+////////////////        worldX = cowRect.anchoredPosition.x;
+
+////////////////        SetState(CowState.Idle);
+////////////////    }
+
+////////////////    void Update()
+////////////////    {
+////////////////        if (!isRunning) return;
+
+////////////////        // ✅ AUTO RUN
+////////////////        worldX += moveSpeed * Time.deltaTime;
+
+////////////////        // ✅ KEYBOARD JUMP
+////////////////        if (Input.GetKeyDown(KeyCode.Space))
+////////////////            PlayJump();
+////////////////    }
+
+////////////////    // =========================
+////////////////    // GAME CONTROL
+////////////////    // =========================
+////////////////    public void StartRunning()
+////////////////    {
+////////////////        isRunning = true;
+////////////////        SetState(CowState.SideRun);
+////////////////    }
+
+////////////////    public void StopRunning()
+////////////////    {
+////////////////        isRunning = false;
+////////////////    }
+
+////////////////    // =========================
+////////////////    // ACTIONS
+////////////////    // =========================
+////////////////    public void PlayJump()
+////////////////    {
+////////////////        if (isJumping) return;              // 🚫 prevent loop
+////////////////        if (currentState == CowState.Win) return;
+
+////////////////        isJumping = true;
+////////////////        SetState(CowState.Jump);
+////////////////    }
+
+////////////////    public void PlayHit()
+////////////////    {
+////////////////        if (currentState == CowState.Win) return;
+////////////////        SetState(CowState.Hit);
+////////////////    }
+
+////////////////    public void PlayWin()
+////////////////    {
+////////////////        StopRunning();
+////////////////        SetState(CowState.Win);
+
+////////////////        GameManager.Instance?.SendMessage("ShowCongrats");
+////////////////    }
+
+////////////////    public void PlayHitThenWin()
+////////////////    {
+////////////////        StartCoroutine(HitThenWinRoutine());
+////////////////    }
+
+////////////////    IEnumerator HitThenWinRoutine()
+////////////////    {
+////////////////        SetState(CowState.Hit);
+////////////////        yield return new WaitForSeconds(0.5f);
+////////////////        PlayWin();
+////////////////    }
+
+////////////////    // UI Button
+////////////////    public void OnJumpDown()
+////////////////    {
+////////////////        PlayJump();
+////////////////    }
+
+////////////////    // =========================
+////////////////    void SetState(CowState state)
+////////////////    {
+////////////////        currentState = state;
+////////////////        StopAllCoroutines();
+////////////////        StartCoroutine(Animate());
+////////////////    }
+
+////////////////    IEnumerator Animate()
+////////////////    {
+////////////////        Sprite[] frames = idleFrames;
+
+////////////////        switch (currentState)
+////////////////        {
+////////////////            case CowState.Idle: frames = idleFrames; break;
+////////////////            case CowState.SideRun: frames = runFrames; break;
+////////////////            case CowState.Jump: frames = jumpFrames; break;
+////////////////            case CowState.Hit: frames = hitFrames; break;
+////////////////            case CowState.Win: frames = winFrames; break;
+////////////////        }
+
+////////////////        int i = 0;
+
+////////////////        while (true)
+////////////////        {
+////////////////            if (frames == null || frames.Length == 0)
+////////////////                yield break;
+
+////////////////            cowImage.sprite = frames[i];
+////////////////            i++;
+
+////////////////            // ✅ JUMP END FIX
+////////////////            if (currentState == CowState.Jump && i >= frames.Length)
+////////////////            {
+////////////////                isJumping = false;                 // 🔥 unlock jump
+////////////////                SetState(CowState.SideRun);        // back to run
+////////////////                yield break;
+////////////////            }
+
+////////////////            // ✅ HIT END
+////////////////            if (currentState == CowState.Hit && i >= frames.Length)
+////////////////            {
+////////////////                SetState(CowState.SideRun);
+////////////////                yield break;
+////////////////            }
+
+////////////////            // LOOP states
+////////////////            if (i >= frames.Length)
+////////////////                i = 0;
+
+////////////////            yield return new WaitForSeconds(1f / fps);
+////////////////        }
+////////////////    }
+////////////////}
+
+//////////////using UnityEngine;
+//////////////using UnityEngine.UI;
+//////////////using System.Collections;
+
+//////////////public class Cowanimationcontroller : MonoBehaviour
+//////////////{
+//////////////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+//////////////    [Header("Auto Run")]
+//////////////    public float runSpeed = 200f;
+
+//////////////    [Header("Idle Animation")]
+//////////////    public Sprite[] idleFrames;
+//////////////    public float idleFPS = 12f;
+
+//////////////    [Header("Run Animation")]
+//////////////    public Sprite[] runFrames;
+//////////////    public float runFPS = 12f;
+
+//////////////    [Header("Jump Animation")]
+//////////////    public Sprite[] jumpFrames;
+//////////////    public float jumpFPS = 12f;
+
+//////////////    [Header("Hit Animation")]
+//////////////    public Sprite[] hitFrames;
+//////////////    public float hitFPS = 12f;
+
+//////////////    [Header("Win / Celebration Animation")]
+//////////////    public Sprite[] winFrames;
+//////////////    public float winFPS = 12f;
+
+//////////////    private Image cowImage;
+//////////////    private RectTransform cowRect;
+//////////////    private Vector2 originalSize;
+//////////////    private bool isAlive = false;
+//////////////    private bool hitThenWin = false;
+
+//////////////    // ✅ PUBLIC — BellTrigger reads this to check if cow is jumping
+//////////////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+//////////////    [HideInInspector] public float worldX = 0f;
+//////////////    [HideInInspector] public bool isRunning = false;
+
+//////////////    // ──────────────────────────────────────────────────────────
+//////////////    void Start()
+//////////////    {
+//////////////        isAlive = true;
+//////////////        cowImage = GetComponent<Image>();
+//////////////        cowRect = GetComponent<RectTransform>();
+//////////////        originalSize = cowRect.sizeDelta;
+//////////////        worldX = cowRect.anchoredPosition.x;
+//////////////        SetState(CowState.Idle);
+
+//////////////        if (GameManager.Instance != null)
+//////////////        {
+//////////////            GameManager.Instance.OnGameStart += StartRunning;
+//////////////            GameManager.Instance.OnGameWin += StopRunning;
+//////////////        }
+//////////////    }
+
+//////////////    void OnDestroy()
+//////////////    {
+//////////////        isAlive = false;
+//////////////        StopAllCoroutines();
+//////////////        if (GameManager.Instance != null)
+//////////////        {
+//////////////            GameManager.Instance.OnGameStart -= StartRunning;
+//////////////            GameManager.Instance.OnGameWin -= StopRunning;
+//////////////        }
+//////////////    }
+
+//////////////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+//////////////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+//////////////    // ──────────────────────────────────────────────────────────
+//////////////    void Update()
+//////////////    {
+//////////////        if (!isAlive) return;
+//////////////        if (CurrentState == CowState.Win) return;
+//////////////        if (CurrentState == CowState.Hit) return;
+
+//////////////        if (isRunning)
+//////////////        {
+//////////////            worldX += runSpeed * Time.deltaTime;
+
+//////////////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+//////////////                PlayJump();
+//////////////        }
+//////////////    }
+
+//////////////    void StartRunning() { isRunning = true; SetState(CowState.Run); }
+//////////////    void StopRunning() { isRunning = false; }
+
+//////////////    // ──────────────────────────────────────────────────────────
+//////////////    public void PlayJump()
+//////////////    {
+//////////////        if (!isAlive) return;
+//////////////        if (CurrentState == CowState.Win) return;
+//////////////        if (CurrentState == CowState.Jump) return;
+//////////////        if (CurrentState == CowState.Hit) return;
+//////////////        SetState(CowState.Jump);
+//////////////    }
+
+//////////////    public void PlayHit()
+//////////////    {
+//////////////        if (!isAlive) return;
+//////////////        if (CurrentState == CowState.Hit) return;
+//////////////        if (CurrentState == CowState.Win) return;
+//////////////        hitThenWin = false;
+//////////////        SetState(CowState.Hit);
+//////////////    }
+
+//////////////    // ✅ Called by BellTrigger — Hit once → then Celebration loops
+//////////////    public void PlayHitThenWin()
+//////////////    {
+//////////////        if (!isAlive) return;
+//////////////        if (CurrentState == CowState.Win) return;
+//////////////        Debug.Log("[Cow] PlayHitThenWin!");
+//////////////        hitThenWin = true;
+//////////////        isRunning = false;
+//////////////        SetState(CowState.Hit);
+//////////////    }
+
+//////////////    public void OnJumpPressed() => PlayJump();
+
+//////////////    // ──────────────────────────────────────────────────────────
+//////////////    void SetState(CowState newState)
+//////////////    {
+//////////////        if (!isAlive) return;
+//////////////        CurrentState = newState;
+//////////////        Debug.Log($"[Cow] → {newState}");
+//////////////        StopAllCoroutines();
+//////////////        StartCoroutine(MasterLoop());
+//////////////    }
+
+//////////////    IEnumerator MasterLoop()
+//////////////    {
+//////////////        int frame = 0;
+//////////////        while (true)
+//////////////        {
+//////////////            if (!isAlive) yield break;
+
+//////////////            Sprite[] frames = null;
+//////////////            float fps = 12f;
+
+//////////////            switch (CurrentState)
+//////////////            {
+//////////////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+//////////////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+//////////////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+//////////////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+//////////////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+//////////////            }
+
+//////////////            if (frames == null || frames.Length == 0)
+//////////////            {
+//////////////                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
+//////////////                yield return new WaitForSeconds(0.1f);
+//////////////                continue;
+//////////////            }
+
+//////////////            if (frame >= frames.Length) frame = 0;
+//////////////            cowImage.sprite = frames[frame];
+//////////////            cowRect.sizeDelta = originalSize;
+//////////////            frame++;
+
+//////////////            // Jump → ONCE → back to Run
+//////////////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+//////////////            {
+//////////////                frame = 0;
+//////////////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////////            }
+
+//////////////            // Hit → ONCE → Win or Run
+//////////////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+//////////////            {
+//////////////                frame = 0;
+//////////////                if (hitThenWin)
+//////////////                {
+//////////////                    hitThenWin = false;
+//////////////                    CurrentState = CowState.Win;
+//////////////                    Debug.Log("[Cow] Hit done → Celebration!");
+//////////////                }
+//////////////                else
+//////////////                {
+//////////////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////////                }
+//////////////            }
+
+//////////////            // Idle / Run / Win → loop forever
+//////////////            if (frame >= frames.Length) frame = 0;
+
+//////////////            yield return new WaitForSeconds(1f / fps);
+//////////////        }
+//////////////    }
+//////////////}
+////////////using UnityEngine;
+////////////using UnityEngine.UI;
+////////////using System.Collections;
+
+////////////public class Cowanimationcontroller : MonoBehaviour
+////////////{
+////////////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+////////////    [Header("Auto Run")]
+////////////    public float runSpeed = 200f;
+
+////////////    [Header("Idle Animation")]
+////////////    public Sprite[] idleFrames;
+////////////    public float idleFPS = 12f;
+
+////////////    [Header("Run Animation")]
+////////////    public Sprite[] runFrames;
+////////////    public float runFPS = 12f;
+
+////////////    [Header("Jump Animation")]
+////////////    public Sprite[] jumpFrames;
+////////////    public float jumpFPS = 12f;
+
+////////////    [Header("Hit Animation")]
+////////////    public Sprite[] hitFrames;
+////////////    public float hitFPS = 12f;
+
+////////////    [Header("Win / Celebration Animation")]
+////////////    public Sprite[] winFrames;
+////////////    public float winFPS = 12f;
+
+////////////    private Image cowImage;
+////////////    private RectTransform cowRect;
+////////////    private Vector2 originalSize;
+////////////    private bool isAlive = false;
+////////////    private bool hitThenWin = false;
+
+////////////    // ✅ PUBLIC — GameManager calls StartRunning(), BellTrigger reads CurrentState
+////////////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+////////////    [HideInInspector] public float worldX = 0f;
+////////////    [HideInInspector] public bool isRunning = false;
+
+////////////    // ──────────────────────────────────────────────────────────
+////////////    void Start()
+////////////    {
+////////////        isAlive = true;
+////////////        cowImage = GetComponent<Image>();
+////////////        cowRect = GetComponent<RectTransform>();
+////////////        originalSize = cowRect.sizeDelta;
+////////////        worldX = cowRect.anchoredPosition.x;
+////////////        SetState(CowState.Idle);
+////////////    }
+
+////////////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+////////////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+////////////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+////////////    // ──────────────────────────────────────────────────────────
+////////////    void Update()
+////////////    {
+////////////        if (!isAlive) return;
+////////////        if (CurrentState == CowState.Win) return;
+////////////        if (CurrentState == CowState.Hit) return;
+
+////////////        if (isRunning)
+////////////        {
+////////////            worldX += runSpeed * Time.deltaTime;
+
+////////////            // Jump — Space or Up Arrow
+////////////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+////////////                PlayJump();
+////////////        }
+////////////    }
+
+////////////    // ──────────────────────────────────────────────────────────
+////////////    // ✅ Called by GameManager.CountdownRoutine() after GO!!
+////////////    // ──────────────────────────────────────────────────────────
+////////////    public void StartRunning()
+////////////    {
+////////////        isRunning = true;
+////////////        SetState(CowState.Run);
+////////////        Debug.Log("[Cow] StartRunning called by GameManager!");
+////////////    }
+
+////////////    public void StopRunning()
+////////////    {
+////////////        isRunning = false;
+////////////    }
+
+////////////    // ──────────────────────────────────────────────────────────
+////////////    // Public methods
+////////////    // ──────────────────────────────────────────────────────────
+////////////    public void PlayIdle()
+////////////    {
+////////////        if (!isAlive) return;
+////////////        SetState(CowState.Idle);
+////////////    }
+
+////////////    public void PlayJump()
+////////////    {
+////////////        if (!isAlive) return;
+////////////        if (CurrentState == CowState.Win) return;
+////////////        if (CurrentState == CowState.Jump) return;
+////////////        if (CurrentState == CowState.Hit) return;
+////////////        SetState(CowState.Jump);
+////////////    }
+
+////////////    public void PlayHit()
+////////////    {
+////////////        if (!isAlive) return;
+////////////        if (CurrentState == CowState.Hit) return;
+////////////        if (CurrentState == CowState.Win) return;
+////////////        hitThenWin = false;
+////////////        SetState(CowState.Hit);
+////////////    }
+
+////////////    // ✅ Called by BellTrigger — Hit once → Celebration loops
+////////////    public void PlayHitThenWin()
+////////////    {
+////////////        if (!isAlive) return;
+////////////        if (CurrentState == CowState.Win) return;
+////////////        Debug.Log("[Cow] PlayHitThenWin!");
+////////////        hitThenWin = true;
+////////////        isRunning = false;
+////////////        SetState(CowState.Hit);
+////////////    }
+
+////////////    // On-screen jump button
+////////////    public void OnJumpPressed() => PlayJump();
+
+////////////    // ──────────────────────────────────────────────────────────
+////////////    void SetState(CowState newState)
+////////////    {
+////////////        if (!isAlive) return;
+////////////        CurrentState = newState;
+////////////        Debug.Log($"[Cow] → {newState}");
+////////////        StopAllCoroutines();
+////////////        StartCoroutine(MasterLoop());
+////////////    }
+
+////////////    IEnumerator MasterLoop()
+////////////    {
+////////////        int frame = 0;
+////////////        while (true)
+////////////        {
+////////////            if (!isAlive) yield break;
+
+////////////            Sprite[] frames = null;
+////////////            float fps = 12f;
+
+////////////            switch (CurrentState)
+////////////            {
+////////////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+////////////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+////////////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+////////////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+////////////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+////////////            }
+
+////////////            if (frames == null || frames.Length == 0)
+////////////            {
+////////////                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
+////////////                yield return new WaitForSeconds(0.1f);
+////////////                continue;
+////////////            }
+
+////////////            if (frame >= frames.Length) frame = 0;
+////////////            cowImage.sprite = frames[frame];
+////////////            cowRect.sizeDelta = originalSize;
+////////////            frame++;
+
+////////////            // Jump → ONCE → back to Run
+////////////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+////////////            {
+////////////                frame = 0;
+////////////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+////////////            }
+
+////////////            // Hit → ONCE → Win or Run
+////////////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+////////////            {
+////////////                frame = 0;
+////////////                if (hitThenWin)
+////////////                {
+////////////                    hitThenWin = false;
+////////////                    CurrentState = CowState.Win;
+////////////                    Debug.Log("[Cow] → Celebration!");
+////////////                }
+////////////                else
+////////////                {
+////////////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+////////////                }
+////////////            }
+
+////////////            // Idle / Run / Win → loop forever
+////////////            if (frame >= frames.Length) frame = 0;
+
+////////////            yield return new WaitForSeconds(1f / fps);
+////////////        }
+////////////    }
+////////////}
+//////////using UnityEngine;
+//////////using UnityEngine.UI;
+//////////using System.Collections;
+
+//////////public class Cowanimationcontroller : MonoBehaviour
+//////////{
+//////////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+//////////    [Header("Auto Run")]
+//////////    public float runSpeed = 200f;
+
+//////////    [Header("Idle Animation")]
+//////////    public Sprite[] idleFrames;
+//////////    public float idleFPS = 12f;
+
+//////////    [Header("Run Animation")]
+//////////    public Sprite[] runFrames;
+//////////    public float runFPS = 12f;
+
+//////////    [Header("Jump Animation")]
+//////////    public Sprite[] jumpFrames;
+//////////    public float jumpFPS = 12f;
+
+//////////    [Header("Hit Animation")]
+//////////    public Sprite[] hitFrames;
+//////////    public float hitFPS = 12f;
+
+//////////    [Header("Win / Celebration Animation")]
+//////////    public Sprite[] winFrames;
+//////////    public float winFPS = 12f;
+
+//////////    private Image cowImage;
+//////////    private RectTransform cowRect;
+//////////    private Vector2 originalSize;
+//////////    private bool isAlive = false;
+//////////    private bool hitThenWin = false;
+
+//////////    // BellTrigger reads CurrentState to know if cow is jumping
+//////////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+//////////    [HideInInspector] public float worldX = 0f;
+//////////    [HideInInspector] public bool isRunning = false;
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void Start()
+//////////    {
+//////////        isAlive = true;
+//////////        cowImage = GetComponent<Image>();
+//////////        cowRect = GetComponent<RectTransform>();
+//////////        originalSize = cowRect.sizeDelta;
+//////////        worldX = cowRect.anchoredPosition.x;
+//////////        SetState(CowState.Idle);
+//////////    }
+
+//////////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+//////////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+//////////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void Update()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        if (CurrentState == CowState.Hit) return;
+
+//////////        if (isRunning)
+//////////        {
+//////////            worldX += runSpeed * Time.deltaTime;
+
+//////////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+//////////                PlayJump();
+//////////        }
+//////////    }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    // Called by GameManager countdown after "GO!!"
+//////////    // ──────────────────────────────────────────────────────────
+//////////    public void StartRunning()
+//////////    {
+//////////        isRunning = true;
+//////////        SetState(CowState.Run);
+//////////        Debug.Log("[Cow] StartRunning!");
+//////////    }
+
+//////////    public void StopRunning()
+//////////    {
+//////////        isRunning = false;
+//////////    }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    // Public actions
+//////////    // ──────────────────────────────────────────────────────────
+//////////    public void PlayIdle()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        SetState(CowState.Idle);
+//////////    }
+
+//////////    public void PlayJump()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        if (CurrentState == CowState.Jump) return;
+//////////        if (CurrentState == CowState.Hit) return;
+//////////        Debug.Log("[Cow] PlayJump!");
+//////////        SetState(CowState.Jump);
+//////////    }
+
+//////////    // ── UI Button hooks ────────────────────────────────────────
+//////////    // Both names wired here so either old or new button reference works
+//////////    public void OnJumpPressed() => PlayJump();
+//////////    public void OnJumpDown() => PlayJump(); // legacy alias — keep button working
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    public void PlayHit()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Hit) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        hitThenWin = false;
+//////////        SetState(CowState.Hit);
+//////////    }
+
+//////////    // Called by BellTrigger: plays Hit once, then loops Win/celebration
+//////////    public void PlayHitThenWin()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        Debug.Log("[Cow] PlayHitThenWin!");
+//////////        hitThenWin = true;
+//////////        isRunning = false;
+//////////        SetState(CowState.Hit);
+//////////    }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void SetState(CowState newState)
+//////////    {
+//////////        if (!isAlive) return;
+//////////        CurrentState = newState;
+//////////        Debug.Log($"[Cow] State → {newState}");
+//////////        StopAllCoroutines();
+//////////        StartCoroutine(MasterLoop());
+//////////    }
+
+//////////    IEnumerator MasterLoop()
+//////////    {
+//////////        int frame = 0;
+//////////        while (true)
+//////////        {
+//////////            if (!isAlive) yield break;
+
+//////////            Sprite[] frames = null;
+//////////            float fps = 12f;
+
+//////////            switch (CurrentState)
+//////////            {
+//////////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+//////////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+//////////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+//////////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+//////////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+//////////            }
+
+//////////            if (frames == null || frames.Length == 0)
+//////////            {
+//////////                Debug.LogError($"[Cow] {CurrentState} frames are EMPTY — assign sprites in Inspector!");
+//////////                yield return new WaitForSeconds(0.1f);
+//////////                continue;
+//////////            }
+
+//////////            if (frame >= frames.Length) frame = 0;
+//////////            cowImage.sprite = frames[frame];
+//////////            cowRect.sizeDelta = originalSize;
+//////////            frame++;
+
+//////////            // Jump plays ONCE then returns to Run
+//////////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+//////////            {
+//////////                frame = 0;
+//////////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////            }
+
+//////////            // Hit plays ONCE then either Win or Run
+//////////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+//////////            {
+//////////                frame = 0;
+//////////                if (hitThenWin)
+//////////                {
+//////////                    hitThenWin = false;
+//////////                    CurrentState = CowState.Win;
+//////////                    Debug.Log("[Cow] Hit done → Win/Celebration!");
+//////////                }
+//////////                else
+//////////                {
+//////////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////                }
+//////////            }
+
+//////////            // Idle / Run / Win loop forever
+//////////            if (frame >= frames.Length) frame = 0;
+
+//////////            yield return new WaitForSeconds(1f / fps);
+//////////        }
+//////////    }
+//////////}
+
+//////////using UnityEngine;
+//////////using UnityEngine.UI;
+//////////using System.Collections;
+
+//////////public class Cowanimationcontroller : MonoBehaviour
+//////////{
+//////////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+//////////    [Header("Auto Run")]
+//////////    public float runSpeed = 200f;
+
+//////////    [Header("Idle Animation")]
+//////////    public Sprite[] idleFrames;
+//////////    public float idleFPS = 12f;
+
+//////////    [Header("Run Animation")]
+//////////    public Sprite[] runFrames;
+//////////    public float runFPS = 12f;
+
+//////////    [Header("Jump Animation")]
+//////////    public Sprite[] jumpFrames;
+//////////    public float jumpFPS = 12f;
+
+//////////    [Header("Jump Size")]
+//////////    [Tooltip("1 = same as run/idle size.  1.3 = 30% bigger.  Try values between 1.0 and 2.0.")]
+//////////    [Range(0.5f, 3f)]
+//////////    public float jumpScale = 1f;   // ← drag this slider in the Inspector
+
+//////////    [Header("Hit Animation")]
+//////////    public Sprite[] hitFrames;
+//////////    public float hitFPS = 12f;
+
+//////////    [Header("Win / Celebration Animation")]
+//////////    public Sprite[] winFrames;
+//////////    public float winFPS = 12f;
+
+//////////    private Image cowImage;
+//////////    private RectTransform cowRect;
+//////////    private Vector2 originalSize;
+//////////    private bool isAlive = false;
+//////////    private bool hitThenWin = false;
+
+//////////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+//////////    [HideInInspector] public float worldX = 0f;
+//////////    [HideInInspector] public bool isRunning = false;
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void Start()
+//////////    {
+//////////        isAlive = true;
+//////////        cowImage = GetComponent<Image>();
+//////////        cowRect = GetComponent<RectTransform>();
+//////////        originalSize = cowRect.sizeDelta;
+//////////        worldX = cowRect.anchoredPosition.x;
+//////////        SetState(CowState.Idle);
+//////////    }
+
+//////////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+//////////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+//////////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void Update()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        if (CurrentState == CowState.Hit) return;
+
+//////////        if (isRunning)
+//////////        {
+//////////            worldX += runSpeed * Time.deltaTime;
+
+//////////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+//////////                PlayJump();
+//////////        }
+//////////    }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    public void StartRunning()
+//////////    {
+//////////        isRunning = true;
+//////////        SetState(CowState.Run);
+//////////        Debug.Log("[Cow] StartRunning!");
+//////////    }
+
+//////////    public void StopRunning()
+//////////    {
+//////////        isRunning = false;
+//////////    }
+
+//////////    public void PlayJump()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        if (CurrentState == CowState.Jump) return;
+//////////        if (CurrentState == CowState.Hit) return;
+//////////        Debug.Log("[Cow] Jump!");
+//////////        SetState(CowState.Jump);
+//////////    }
+
+//////////    public void OnJumpPressed() => PlayJump();
+//////////    public void OnJumpDown() => PlayJump();
+
+//////////    public void PlayHit()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Hit) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        hitThenWin = false;
+//////////        SetState(CowState.Hit);
+//////////    }
+
+//////////    public void PlayHitThenWin()
+//////////    {
+//////////        if (!isAlive) return;
+//////////        if (CurrentState == CowState.Win) return;
+//////////        Debug.Log("[Cow] PlayHitThenWin!");
+//////////        hitThenWin = true;
+//////////        isRunning = false;
+//////////        SetState(CowState.Hit);
+//////////    }
+
+//////////    // ──────────────────────────────────────────────────────────
+//////////    void SetState(CowState newState)
+//////////    {
+//////////        if (!isAlive) return;
+//////////        CurrentState = newState;
+//////////        Debug.Log($"[Cow] → {newState}");
+//////////        StopAllCoroutines();
+//////////        StartCoroutine(MasterLoop());
+//////////    }
+
+//////////    IEnumerator MasterLoop()
+//////////    {
+//////////        int frame = 0;
+//////////        while (true)
+//////////        {
+//////////            if (!isAlive) yield break;
+
+//////////            Sprite[] frames = null;
+//////////            float fps = 12f;
+
+//////////            switch (CurrentState)
+//////////            {
+//////////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+//////////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+//////////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+//////////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+//////////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+//////////            }
+
+//////////            if (frames == null || frames.Length == 0)
+//////////            {
+//////////                Debug.LogError($"[Cow] {CurrentState} frames are EMPTY!");
+//////////                yield return new WaitForSeconds(0.1f);
+//////////                continue;
+//////////            }
+
+//////////            if (frame >= frames.Length) frame = 0;
+
+//////////            cowImage.sprite = frames[frame];
+
+//////////            // Apply jumpScale only during Jump, otherwise restore original size
+//////////            cowRect.sizeDelta = (CurrentState == CowState.Jump)
+//////////                ? originalSize * jumpScale
+//////////                : originalSize;
+
+//////////            frame++;
+
+//////////            // Jump plays once → back to Run
+//////////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+//////////            {
+//////////                frame = 0;
+//////////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////            }
+
+//////////            // Hit plays once → Win or Run
+//////////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+//////////            {
+//////////                frame = 0;
+//////////                if (hitThenWin)
+//////////                {
+//////////                    hitThenWin = false;
+//////////                    CurrentState = CowState.Win;
+//////////                    Debug.Log("[Cow] → Celebration!");
+//////////                }
+//////////                else
+//////////                {
+//////////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////////                }
+//////////            }
+
+//////////            // Idle / Run / Win loop forever
+//////////            if (frame >= frames.Length) frame = 0;
+
+//////////            yield return new WaitForSeconds(1f / fps);
+//////////        }
+//////////    }
+//////////}
+
+////////using UnityEngine;
+////////using UnityEngine.UI;
+////////using System.Collections;
+
+////////public class Cowanimationcontroller : MonoBehaviour
+////////{
+////////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+////////    [Header("Auto Run")]
+////////    public float runSpeed = 200f;
+
+////////    [Header("Jump Physics")]
+////////    public float jumpHeight = 250f;   // how high the cow goes (pixels)
+////////    public float jumpDuration = 0.7f;   // total time in air (seconds)
+
+////////    [Header("Idle Animation")]
+////////    public Sprite[] idleFrames;
+////////    public float idleFPS = 12f;
+
+////////    [Header("Run Animation")]
+////////    public Sprite[] runFrames;
+////////    public float runFPS = 12f;
+
+////////    [Header("Jump Animation")]
+////////    public Sprite[] jumpFrames;
+////////    public float jumpFPS = 12f;
+
+////////    [Header("Hit Animation")]
+////////    public Sprite[] hitFrames;
+////////    public float hitFPS = 12f;
+
+////////    [Header("Win / Celebration Animation")]
+////////    public Sprite[] winFrames;
+////////    public float winFPS = 12f;
+
+////////    private Image cowImage;
+////////    private RectTransform cowRect;
+////////    private Vector2 originalSize;
+////////    private bool isAlive = false;
+////////    private bool hitThenWin = false;
+
+////////    // ✅ PUBLIC — GameManager calls StartRunning(), BellTrigger reads CurrentState
+////////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+////////    [HideInInspector] public float worldX = 0f;
+////////    [HideInInspector] public bool isRunning = false;
+
+////////    // ✅ Ground Y — saved on Start so jump always returns to same Y
+////////    private float groundY;
+
+////////    // ──────────────────────────────────────────────────────────
+////////    void Start()
+////////    {
+////////        isAlive = true;
+////////        cowImage = GetComponent<Image>();
+////////        cowRect = GetComponent<RectTransform>();
+////////        originalSize = cowRect.sizeDelta;
+////////        worldX = cowRect.anchoredPosition.x;
+////////        groundY = cowRect.anchoredPosition.y;   // ✅ remember ground level
+////////        SetState(CowState.Idle);
+////////    }
+
+////////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+////////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+////////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+////////    // ──────────────────────────────────────────────────────────
+////////    void Update()
+////////    {
+////////        if (!isAlive) return;
+////////        if (CurrentState == CowState.Win) return;
+////////        if (CurrentState == CowState.Hit) return;
+
+////////        if (isRunning)
+////////        {
+////////            worldX += runSpeed * Time.deltaTime;
+
+////////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+////////                PlayJump();
+////////        }
+////////    }
+
+////////    // ──────────────────────────────────────────────────────────
+////////    // Called by GameManager after countdown
+////////    // ──────────────────────────────────────────────────────────
+////////    public void StartRunning()
+////////    {
+////////        isRunning = true;
+////////        SetState(CowState.Run);
+////////        Debug.Log("[Cow] StartRunning!");
+////////    }
+
+////////    public void StopRunning() => isRunning = false;
+
+////////    // ──────────────────────────────────────────────────────────
+////////    // Public methods
+////////    // ──────────────────────────────────────────────────────────
+////////    public void PlayJump()
+////////    {
+////////        if (!isAlive) return;
+////////        if (CurrentState == CowState.Win) return;
+////////        if (CurrentState == CowState.Jump) return;  // no double jump
+////////        if (CurrentState == CowState.Hit) return;
+////////        Debug.Log("[Cow] Jump!");
+////////        StartCoroutine(JumpArc());   // ✅ move cow up and down
+////////        SetState(CowState.Jump);
+////////    }
+
+////////    public void OnJumpPressed() => PlayJump();
+////////    public void OnJumpDown() => PlayJump();
+
+////////    public void PlayHit()
+////////    {
+////////        if (!isAlive) return;
+////////        if (CurrentState == CowState.Hit) return;
+////////        if (CurrentState == CowState.Win) return;
+////////        hitThenWin = false;
+////////        SetState(CowState.Hit);
+////////    }
+
+////////    public void PlayHitThenWin()
+////////    {
+////////        if (!isAlive) return;
+////////        if (CurrentState == CowState.Win) return;
+////////        Debug.Log("[Cow] PlayHitThenWin!");
+////////        hitThenWin = true;
+////////        isRunning = false;
+////////        SetState(CowState.Hit);
+////////    }
+
+////////    // ──────────────────────────────────────────────────────────
+////////    // ✅ Jump Arc — smooth parabola up and back down
+////////    // ──────────────────────────────────────────────────────────
+////////    IEnumerator JumpArc()
+////////    {
+////////        float elapsed = 0f;
+
+////////        while (elapsed < jumpDuration)
+////////        {
+////////            elapsed += Time.deltaTime;
+
+////////            // Normalised time 0→1
+////////            float t = elapsed / jumpDuration;
+
+////////            // Parabola: peaks at t=0.5, returns to 0 at t=1
+////////            float height = jumpHeight * 4f * t * (1f - t);
+
+////////            // ✅ Only change Y — X is handled by BackgroundScroller
+////////            cowRect.anchoredPosition = new Vector2(
+////////                cowRect.anchoredPosition.x,
+////////                groundY + height
+////////            );
+
+////////            yield return null;
+////////        }
+
+////////        // ✅ Snap exactly back to ground when done
+////////        cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, groundY);
+////////    }
+
+////////    // ──────────────────────────────────────────────────────────
+////////    void SetState(CowState newState)
+////////    {
+////////        if (!isAlive) return;
+////////        CurrentState = newState;
+////////        Debug.Log($"[Cow] → {newState}");
+////////        StopAllCoroutines();
+////////        StartCoroutine(MasterLoop());
+////////    }
+
+////////    IEnumerator MasterLoop()
+////////    {
+////////        int frame = 0;
+////////        while (true)
+////////        {
+////////            if (!isAlive) yield break;
+
+////////            Sprite[] frames = null;
+////////            float fps = 12f;
+
+////////            switch (CurrentState)
+////////            {
+////////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+////////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+////////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+////////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+////////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+////////            }
+
+////////            if (frames == null || frames.Length == 0)
+////////            {
+////////                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
+////////                yield return new WaitForSeconds(0.1f);
+////////                continue;
+////////            }
+
+////////            if (frame >= frames.Length) frame = 0;
+////////            cowImage.sprite = frames[frame];
+////////            cowRect.sizeDelta = originalSize;
+////////            frame++;
+
+////////            // Jump → ONCE → back to Run
+////////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+////////            {
+////////                frame = 0;
+////////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+////////            }
+
+////////            // Hit → ONCE → Win or Run
+////////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+////////            {
+////////                frame = 0;
+////////                if (hitThenWin)
+////////                {
+////////                    hitThenWin = false;
+////////                    CurrentState = CowState.Win;
+////////                    Debug.Log("[Cow] → Celebration!");
+////////                }
+////////                else
+////////                {
+////////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+////////                }
+////////            }
+
+////////            // Idle / Run / Win → loop forever
+////////            if (frame >= frames.Length) frame = 0;
+
+////////            yield return new WaitForSeconds(1f / fps);
+////////        }
+////////    }
+////////}
+
+//////using UnityEngine;
+//////using UnityEngine.UI;
+//////using System.Collections;
+
+//////public class Cowanimationcontroller : MonoBehaviour
+//////{
+//////    public enum CowState { Idle, Run, Jump, Hit, Win }
+
+//////    [Header("Auto Run")]
+//////    public float runSpeed = 200f;
+
+//////    [Header("Jump Physics")]
+//////    public float jumpHeight = 250f;   // pixels — how high the cow goes
+//////    public float jumpDuration = 0.7f;   // seconds — time in the air
+
+//////    [Header("Idle Animation")]
+//////    public Sprite[] idleFrames;
+//////    public float idleFPS = 12f;
+
+//////    [Header("Run Animation")]
+//////    public Sprite[] runFrames;
+//////    public float runFPS = 12f;
+
+//////    [Header("Jump Animation")]
+//////    public Sprite[] jumpFrames;
+//////    public float jumpFPS = 12f;
+
+//////    [Header("Hit Animation")]
+//////    public Sprite[] hitFrames;
+//////    public float hitFPS = 12f;
+
+//////    [Header("Win / Celebration Animation")]
+//////    public Sprite[] winFrames;
+//////    public float winFPS = 12f;
+
+//////    // ── Private ────────────────────────────────────────────────
+//////    private Image cowImage;
+//////    private RectTransform cowRect;
+//////    private Vector2 originalSize;
+//////    private bool isAlive = false;
+//////    private bool hitThenWin = false;
+//////    private float groundY;   // Y position at ground level
+
+//////    // ✅ Separate coroutine references so JumpArc is never killed by StopAllCoroutines
+//////    private Coroutine animLoop = null;
+//////    private Coroutine jumpArcCo = null;
+
+//////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+//////    [HideInInspector] public float worldX = 0f;
+//////    [HideInInspector] public bool isRunning = false;
+
+//////    // ──────────────────────────────────────────────────────────
+//////    void Start()
+//////    {
+//////        isAlive = true;
+//////        cowImage = GetComponent<Image>();
+//////        cowRect = GetComponent<RectTransform>();
+//////        originalSize = cowRect.sizeDelta;
+//////        worldX = cowRect.anchoredPosition.x;
+//////        groundY = cowRect.anchoredPosition.y;  // ✅ save ground level once
+//////        SetState(CowState.Idle);
+//////    }
+
+//////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+//////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+//////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
+
+//////    // ──────────────────────────────────────────────────────────
+//////    void Update()
+//////    {
+//////        if (!isAlive) return;
+//////        if (CurrentState == CowState.Win) return;
+//////        if (CurrentState == CowState.Hit) return;
+
+//////        if (isRunning)
+//////        {
+//////            worldX += runSpeed * Time.deltaTime;
+
+//////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+//////                PlayJump();
+//////        }
+//////    }
+
+//////    // ──────────────────────────────────────────────────────────
+//////    public void StartRunning()
+//////    {
+//////        isRunning = true;
+//////        SetState(CowState.Run);
+//////        Debug.Log("[Cow] StartRunning!");
+//////    }
+
+//////    public void StopRunning() => isRunning = false;
+
+//////    // ──────────────────────────────────────────────────────────
+//////    public void PlayJump()
+//////    {
+//////        if (!isAlive) return;
+//////        if (CurrentState == CowState.Win) return;
+//////        if (CurrentState == CowState.Jump) return;
+//////        if (CurrentState == CowState.Hit) return;
+
+//////        Debug.Log("[Cow] Jump!");
+
+//////        // ✅ Stop any previous arc, start a fresh one independently
+//////        if (jumpArcCo != null) StopCoroutine(jumpArcCo);
+//////        jumpArcCo = StartCoroutine(JumpArc());
+
+//////        // ✅ Switch animation to Jump (only kills animLoop, NOT jumpArcCo)
+//////        SetState(CowState.Jump);
+//////    }
+
+//////    public void OnJumpPressed() => PlayJump();
+//////    public void OnJumpDown() => PlayJump();
+
+//////    public void PlayHit()
+//////    {
+//////        if (!isAlive) return;
+//////        if (CurrentState == CowState.Hit) return;
+//////        if (CurrentState == CowState.Win) return;
+//////        hitThenWin = false;
+//////        SetState(CowState.Hit);
+//////    }
+
+//////    public void PlayHitThenWin()
+//////    {
+//////        if (!isAlive) return;
+//////        if (CurrentState == CowState.Win) return;
+//////        Debug.Log("[Cow] PlayHitThenWin!");
+//////        hitThenWin = true;
+//////        isRunning = false;
+//////        SetState(CowState.Hit);
+//////    }
+
+//////    // ──────────────────────────────────────────────────────────
+//////    // ✅ JumpArc — runs INDEPENDENTLY, never cancelled by SetState
+//////    // ──────────────────────────────────────────────────────────
+//////    IEnumerator JumpArc()
+//////    {
+//////        float elapsed = 0f;
+
+//////        while (elapsed < jumpDuration)
+//////        {
+//////            if (!isAlive) yield break;
+
+//////            elapsed += Time.deltaTime;
+//////            float t = Mathf.Clamp01(elapsed / jumpDuration);
+
+//////            // Smooth parabola: 0 → peak → 0
+//////            float height = jumpHeight * 4f * t * (1f - t);
+
+//////            // ✅ Only move Y — BackgroundScroller handles X
+//////            cowRect.anchoredPosition = new Vector2(
+//////                cowRect.anchoredPosition.x,
+//////                groundY + height
+//////            );
+
+//////            yield return null;
+//////        }
+
+//////        // ✅ Snap back to ground exactly
+//////        cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, groundY);
+//////        jumpArcCo = null;
+
+//////        Debug.Log("[Cow] Jump arc finished — back on ground");
+//////    }
+
+//////    // ──────────────────────────────────────────────────────────
+//////    // SetState only stops animLoop — NEVER jumpArcCo
+//////    // ──────────────────────────────────────────────────────────
+//////    void SetState(CowState newState)
+//////    {
+//////        if (!isAlive) return;
+//////        CurrentState = newState;
+//////        Debug.Log($"[Cow] → {newState}");
+
+//////        // ✅ Stop only the animation loop, not the jump arc
+//////        if (animLoop != null) StopCoroutine(animLoop);
+//////        animLoop = StartCoroutine(MasterLoop());
+//////    }
+
+//////    IEnumerator MasterLoop()
+//////    {
+//////        int frame = 0;
+//////        while (true)
+//////        {
+//////            if (!isAlive) yield break;
+
+//////            Sprite[] frames = null;
+//////            float fps = 12f;
+
+//////            switch (CurrentState)
+//////            {
+//////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+//////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+//////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+//////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+//////                case CowState.Win: frames = winFrames; fps = winFPS; break;
+//////            }
+
+//////            if (frames == null || frames.Length == 0)
+//////            {
+//////                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
+//////                yield return new WaitForSeconds(0.1f);
+//////                continue;
+//////            }
+
+//////            if (frame >= frames.Length) frame = 0;
+//////            cowImage.sprite = frames[frame];
+//////            cowRect.sizeDelta = originalSize;
+//////            frame++;
+
+//////            // Jump → ONCE → back to Run
+//////            if (CurrentState == CowState.Jump && frame >= frames.Length)
+//////            {
+//////                frame = 0;
+//////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////            }
+
+//////            // Hit → ONCE → Win or Run
+//////            if (CurrentState == CowState.Hit && frame >= frames.Length)
+//////            {
+//////                frame = 0;
+//////                if (hitThenWin)
+//////                {
+//////                    hitThenWin = false;
+//////                    CurrentState = CowState.Win;
+//////                    Debug.Log("[Cow] → Celebration!");
+//////                }
+//////                else
+//////                {
+//////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//////                }
+//////            }
+
+//////            // Idle / Run / Win → loop forever
+//////            if (frame >= frames.Length) frame = 0;
+
+//////            yield return new WaitForSeconds(1f / fps);
+//////        }
+//////    }
+//////}
+
+
+////using UnityEngine;
 ////using UnityEngine.UI;
 ////using System.Collections;
 
-////public class CowAnimationController : MonoBehaviour
+////public class Cowanimationcontroller : MonoBehaviour
 ////{
-////    public enum CowState { Idle, SideRun, Jump, Hit, Win }
+////    public enum CowState { Idle, Run, Jump, Hit, Win }
 
-////    [Header("Movement")]
-////    public float moveSpeed = 200f;
-////    public float minX = -600f;
-////    public float maxX = 600f;
+////    [Header("Auto Run")]
+////    public float runSpeed = 200f;
+
+////    [Header("Jump Physics")]
+////    public float jumpHeight = 250f;   // pixels — how high
+////    public float jumpDuration = 0.7f;   // seconds — time in air
+////    public float jumpForwardSpeed = 400f;  // pixels/sec forward during jump (faster than runSpeed)
 
 ////    [Header("Idle Animation")]
 ////    public Sprite[] idleFrames;
 ////    public float idleFPS = 12f;
 
-////    [Header("Side Run Animation")]
-////    public Sprite[] sideRunFrames;
-////    public float sideRunFPS = 12f;
+////    [Header("Run Animation")]
+////    public Sprite[] runFrames;
+////    public float runFPS = 12f;
 
 ////    [Header("Jump Animation")]
 ////    public Sprite[] jumpFrames;
@@ -27,274 +1476,246 @@
 ////    public Sprite[] hitFrames;
 ////    public float hitFPS = 12f;
 
-////    [Header("Win Animation")]
+////    [Header("Win / Celebration Animation")]
 ////    public Sprite[] winFrames;
 ////    public float winFPS = 12f;
 
+////    // ── Private ────────────────────────────────────────────────
 ////    private Image cowImage;
 ////    private RectTransform cowRect;
 ////    private Vector2 originalSize;
-////    private CowState currentState = CowState.Idle;
-////    private bool moveLeft = false;
-////    private bool moveRight = false;
-
-////    // ✅ This is the real fix — bool flag the coroutine can safely read
 ////    private bool isAlive = false;
+////    private bool hitThenWin = false;
+////    private float groundY;
+////    private bool isJumping = false;   // ✅ blocks Update from adding runSpeed during jump
 
-////    // ─────────────────────────────────────────────────────────
+////    private Coroutine animLoop = null;
+////    private Coroutine jumpArcCo = null;
+
+////    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+////    [HideInInspector] public float worldX = 0f;
+////    [HideInInspector] public bool isRunning = false;
+
+////    // ──────────────────────────────────────────────────────────
 ////    void Start()
 ////    {
 ////        isAlive = true;
 ////        cowImage = GetComponent<Image>();
 ////        cowRect = GetComponent<RectTransform>();
 ////        originalSize = cowRect.sizeDelta;
+////        worldX = cowRect.anchoredPosition.x;
+////        groundY = cowRect.anchoredPosition.y;
 ////        SetState(CowState.Idle);
 ////    }
 
-////    void OnDestroy()
-////    {
-////        // ✅ Flag goes false BEFORE coroutine can touch destroyed objects
-////        isAlive = false;
-////        StopAllCoroutines();
-////    }
+////    void OnDestroy() { isAlive = false; StopAllCoroutines(); }
+////    void OnDisable() { isAlive = false; StopAllCoroutines(); }
+////    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
 
-////    void OnDisable()
-////    {
-////        isAlive = false;
-////        StopAllCoroutines();
-////    }
-
-////    void OnEnable()
-////    {
-////        // ✅ Re-enable flag if object comes back
-////        if (cowImage != null && cowRect != null)
-////            isAlive = true;
-////    }
-
-////    // ─────────────────────────────────────────────────────────
+////    // ──────────────────────────────────────────────────────────
 ////    void Update()
 ////    {
 ////        if (!isAlive) return;
-////        if (currentState == CowState.Win) return;
+////        if (CurrentState == CowState.Win) return;
+////        if (CurrentState == CowState.Hit) return;
 
-////        HandleMovement();
-////        HandleAnimationSwitch();
-////    }
-
-////    // ─────────────────────────────────────────────────────────
-////    // Movement
-////    // ─────────────────────────────────────────────────────────
-////    //void HandleMovement()
-////    //{
-////    //    bool left = Input.GetKey(KeyCode.LeftArrow);
-////    //    bool right = Input.GetKey(KeyCode.RightArrow);
-
-////    //    if (right)
-////    //    {
-////    //        Vector2 pos = cowRect.anchoredPosition;
-////    //        pos.x = Mathf.Min(pos.x + moveSpeed * Time.deltaTime, maxX);
-////    //        cowRect.anchoredPosition = pos;
-////    //        cowRect.localScale = new Vector3(1f, 1f, 1f);   // face right
-////    //    }
-////    //    else if (left)
-////    //    {
-////    //        Vector2 pos = cowRect.anchoredPosition;
-////    //        pos.x = Mathf.Max(pos.x - moveSpeed * Time.deltaTime, minX);
-////    //        cowRect.anchoredPosition = pos;
-////    //        cowRect.localScale = new Vector3(-1f, 1f, 1f);  // face left (flip)
-////    //    }
-////    //}
-
-////    void HandleMovement()
-////    {
-////        bool left = moveLeft || Input.GetKey(KeyCode.LeftArrow);
-////        bool right = moveRight || Input.GetKey(KeyCode.RightArrow);
-
-////        if (right)
+////        if (isRunning && !isJumping)
 ////        {
-////            Vector2 pos = cowRect.anchoredPosition;
-////            pos.x = Mathf.Min(pos.x + moveSpeed * Time.deltaTime, maxX);
-////            cowRect.anchoredPosition = pos;
-////            cowRect.localScale = new Vector3(1f, 1f, 1f);
+////            // ✅ Normal run speed — JumpArc takes over worldX during jump
+////            worldX += runSpeed * Time.deltaTime;
+
+////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+////                PlayJump();
 ////        }
-////        else if (left)
+////        else if (isRunning && isJumping)
 ////        {
-////            Vector2 pos = cowRect.anchoredPosition;
-////            pos.x = Mathf.Max(pos.x - moveSpeed * Time.deltaTime, minX);
-////            cowRect.anchoredPosition = pos;
-////            cowRect.localScale = new Vector3(-1f, 1f, 1f);
+////            // ✅ Still allow jump input to be read but worldX is driven by JumpArc
+////            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+////                Debug.Log("[Cow] Already jumping!");
 ////        }
 ////    }
 
-////    // ─────────────────────────────────────────────────────────
-////    // Animation switching
-////    // ─────────────────────────────────────────────────────────
-////    void HandleAnimationSwitch()
+////    // ──────────────────────────────────────────────────────────
+////    public void StartRunning()
 ////    {
-////        if (currentState == CowState.Hit) return;
-////        if (currentState == CowState.Jump) return;
-
-////        //bool moving = Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow);
-////        bool moving = moveLeft || moveRight ||
-////              Input.GetKey(KeyCode.LeftArrow) ||
-////              Input.GetKey(KeyCode.RightArrow);
-
-////        if (moving && currentState != CowState.SideRun)
-////            SetState(CowState.SideRun);
-
-////        if (!moving && currentState == CowState.SideRun)
-////            SetState(CowState.Idle);
+////        isRunning = true;
+////        SetState(CowState.Run);
+////        Debug.Log("[Cow] StartRunning!");
 ////    }
 
-////    // ─────────────────────────────────────────────────────────
-////    // Public methods
-////    // ─────────────────────────────────────────────────────────
-////    public void PlayIdle()
-////    {
-////        if (!isAlive) return;
-////        SetState(CowState.Idle);
-////    }
+////    public void StopRunning() => isRunning = false;
 
+////    // ──────────────────────────────────────────────────────────
 ////    public void PlayJump()
 ////    {
 ////        if (!isAlive) return;
-////        if (currentState == CowState.Win) return;
+////        if (CurrentState == CowState.Win) return;
+////        if (CurrentState == CowState.Jump) return;
+////        if (CurrentState == CowState.Hit) return;
+
+////        Debug.Log("[Cow] Jump!");
+
+////        if (jumpArcCo != null) StopCoroutine(jumpArcCo);
+////        jumpArcCo = StartCoroutine(JumpArc());
+
 ////        SetState(CowState.Jump);
 ////    }
+
+////    public void OnJumpPressed() => PlayJump();
+////    public void OnJumpDown() => PlayJump();
 
 ////    public void PlayHit()
 ////    {
 ////        if (!isAlive) return;
-////        if (currentState == CowState.Hit) return;
-////        if (currentState == CowState.Win) return;
+////        if (CurrentState == CowState.Hit) return;
+////        if (CurrentState == CowState.Win) return;
+////        hitThenWin = false;
 ////        SetState(CowState.Hit);
 ////    }
 
-////    public void PlayWin()
+////    public void PlayHitThenWin()
 ////    {
 ////        if (!isAlive) return;
-////        Debug.Log("[Cow] PlayWin called!");
-////        SetState(CowState.Win);
+////        if (CurrentState == CowState.Win) return;
+////        Debug.Log("[Cow] PlayHitThenWin!");
+////        hitThenWin = true;
+////        isRunning = false;
+////        SetState(CowState.Hit);
 ////    }
 
-////    // RIGHT BUTTON
-////    public void OnRightDown()
+////    // ──────────────────────────────────────────────────────────
+////    // ✅ JumpArc — moves cow UP (Y) and FORWARD (worldX) simultaneously
+////    // ──────────────────────────────────────────────────────────
+////    IEnumerator JumpArc()
 ////    {
-////        moveRight = true;
+////        isJumping = true;   // ✅ pause Update from adding runSpeed
+////        float elapsed = 0f;
+
+////        while (elapsed < jumpDuration)
+////        {
+////            if (!isAlive) yield break;
+
+////            elapsed += Time.deltaTime;
+////            float t = Mathf.Clamp01(elapsed / jumpDuration);
+
+////            // ✅ Move forward faster than normal run during jump
+////            worldX += jumpForwardSpeed * Time.deltaTime;
+
+////            // ✅ Parabola arc upward
+////            float height = jumpHeight * 4f * t * (1f - t);
+////            cowRect.anchoredPosition = new Vector2(
+////                cowRect.anchoredPosition.x,
+////                groundY + height
+////            );
+
+////            yield return null;
+////        }
+
+////        // ✅ Snap back to ground
+////        cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, groundY);
+////        isJumping = false;
+////        jumpArcCo = null;
+
+////        Debug.Log("[Cow] Landed!");
 ////    }
 
-////    public void OnRightUp()
-////    {
-////        moveRight = false;
-////    }
-
-////    // LEFT BUTTON
-////    public void OnLeftDown()
-////    {
-////        moveLeft = true;
-////    }
-
-////    public void OnLeftUp()
-////    {
-////        moveLeft = false;
-////    }
-
-////    // ─────────────────────────────────────────────────────────
-////    // State machine
-////    // ─────────────────────────────────────────────────────────
+////    // ──────────────────────────────────────────────────────────
 ////    void SetState(CowState newState)
 ////    {
 ////        if (!isAlive) return;
+////        CurrentState = newState;
+////        Debug.Log($"[Cow] → {newState}");
 
-////        currentState = newState;
-////        Debug.Log($"[Cow] State → {newState}");
-
-////        StopAllCoroutines();
-////        StartCoroutine(MasterLoop());
+////        if (animLoop != null) StopCoroutine(animLoop);
+////        animLoop = StartCoroutine(MasterLoop());
 ////    }
 
 ////    IEnumerator MasterLoop()
 ////    {
 ////        int frame = 0;
-
 ////        while (true)
 ////        {
-////            // ✅ Bool flag check — safe inside coroutines unlike "this == null"
 ////            if (!isAlive) yield break;
 
 ////            Sprite[] frames = null;
 ////            float fps = 12f;
 
-////            switch (currentState)
+////            switch (CurrentState)
 ////            {
-////                case CowState.Idle:
-////                    frames = idleFrames; fps = idleFPS; break;
-////                case CowState.SideRun:
-////                    frames = sideRunFrames; fps = sideRunFPS; break;
-////                case CowState.Jump:
-////                    frames = jumpFrames; fps = jumpFPS; break;
-////                case CowState.Hit:
-////                    frames = hitFrames; fps = hitFPS; break;
-////                case CowState.Win:
-////                    frames = winFrames; fps = winFPS; break;
+////                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
+////                case CowState.Run: frames = runFrames; fps = runFPS; break;
+////                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
+////                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
+////                case CowState.Win: frames = winFrames; fps = winFPS; break;
 ////            }
 
 ////            if (frames == null || frames.Length == 0)
 ////            {
-////                Debug.LogError($"[Cow] {currentState} frames are EMPTY!");
+////                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
 ////                yield return new WaitForSeconds(0.1f);
 ////                continue;
 ////            }
 
 ////            if (frame >= frames.Length) frame = 0;
-
 ////            cowImage.sprite = frames[frame];
 ////            cowRect.sizeDelta = originalSize;
 ////            frame++;
 
-////            // ✅ Hit  → plays ONCE → back to Idle
-////            if (currentState == CowState.Hit && frame >= frames.Length)
+////            // Jump → ONCE → back to Run
+////            if (CurrentState == CowState.Jump && frame >= frames.Length)
 ////            {
 ////                frame = 0;
-////                currentState = CowState.Idle;
+////                CurrentState = isRunning ? CowState.Run : CowState.Idle;
 ////            }
 
-////            // ✅ Jump → plays ONCE → back to Idle
-////            if (currentState == CowState.Jump && frame >= frames.Length)
+////            // Hit → ONCE → Win or Run
+////            if (CurrentState == CowState.Hit && frame >= frames.Length)
 ////            {
 ////                frame = 0;
-////                currentState = CowState.Idle;
+////                if (hitThenWin)
+////                {
+////                    hitThenWin = false;
+////                    CurrentState = CowState.Win;
+////                    Debug.Log("[Cow] → Celebration!");
+////                }
+////                else
+////                {
+////                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+////                }
 ////            }
 
-////            // ✅ Idle, SideRun, Win → loop forever
 ////            if (frame >= frames.Length) frame = 0;
 
 ////            yield return new WaitForSeconds(1f / fps);
 ////        }
 ////    }
-
 ////}
 
 //using UnityEngine;
 //using UnityEngine.UI;
 //using System.Collections;
 
-//public class CowAnimationController : MonoBehaviour
+//public class Cowanimationcontroller : MonoBehaviour
 //{
-//    public enum CowState { Idle, SideRun, Jump, Hit, Win }
+//    public enum CowState { Idle, Run, Jump, Hit, Win }
 
-//    [Header("Movement")]
-//    public float moveSpeed = 200f;
-//    public float minX = -600f;    // left screen boundary
-//    public float maxX = 9000f;   // world X limit (not screen — cow can go far right)
+//    [Header("Auto Run")]
+//    public float runSpeed = 200f;
+
+//    [Header("Jump Physics")]
+//    public float jumpHeight = 250f;   // pixels — how high
+//    public float jumpDuration = 0.7f;   // seconds — time in air
+//    public float jumpForwardSpeed = 400f;   // pixels/sec forward during jump
+//    public int maxJumps = 2;      // ✅ 1 = single jump, 2 = double jump
 
 //    [Header("Idle Animation")]
 //    public Sprite[] idleFrames;
 //    public float idleFPS = 12f;
 
-//    [Header("Side Run Animation")]
-//    public Sprite[] sideRunFrames;
-//    public float sideRunFPS = 12f;
+//    [Header("Run Animation")]
+//    public Sprite[] runFrames;
+//    public float runFPS = 12f;
 
 //    [Header("Jump Animation")]
 //    public Sprite[] jumpFrames;
@@ -304,26 +1725,31 @@
 //    public Sprite[] hitFrames;
 //    public float hitFPS = 12f;
 
-//    [Header("Win Animation")]
+//    [Header("Win / Celebration Animation")]
 //    public Sprite[] winFrames;
 //    public float winFPS = 12f;
 
+//    // ── Private ────────────────────────────────────────────────
 //    private Image cowImage;
 //    private RectTransform cowRect;
 //    private Vector2 originalSize;
-//    private CowState currentState = CowState.Idle;
 //    private bool isAlive = false;
+//    private bool hitThenWin = false;
+//    private float groundY;
+//    private bool isJumping = false;
 
-//    // ✅ Tracks the cow's TRUE world X position (separate from screen position)
-//    //    BackgroundScroller locks cowRect.anchoredPosition.x at followStartX
-//    //    but we still need to know how far the cow has "really" moved
-//    [HideInInspector]
-//    public float worldX = 0f;
+//    // ✅ Double jump counter
+//    private int jumpsLeft = 0;
 
-//    private bool moveLeft = false;
-//    private bool moveRight = false;
+//    private Coroutine animLoop = null;
+//    private Coroutine jumpArcCo = null;
 
-//    // ─────────────────────────────────────────────────────────
+//    public CowState CurrentState { get; private set; } = CowState.Idle;
+
+//    [HideInInspector] public float worldX = 0f;
+//    [HideInInspector] public bool isRunning = false;
+
+//    // ──────────────────────────────────────────────────────────
 //    void Start()
 //    {
 //        isAlive = true;
@@ -331,6 +1757,7 @@
 //        cowRect = GetComponent<RectTransform>();
 //        originalSize = cowRect.sizeDelta;
 //        worldX = cowRect.anchoredPosition.x;
+//        groundY = cowRect.anchoredPosition.y;
 //        SetState(CowState.Idle);
 //    }
 
@@ -338,70 +1765,124 @@
 //    void OnDisable() { isAlive = false; StopAllCoroutines(); }
 //    void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
 
+//    // ──────────────────────────────────────────────────────────
 //    void Update()
 //    {
 //        if (!isAlive) return;
-//        if (currentState == CowState.Win) return;
+//        if (CurrentState == CowState.Win) return;
+//        if (CurrentState == CowState.Hit) return;
 
-//        HandleMovement();
-//        HandleAnimationSwitch();
-//    }
-
-//    // ─────────────────────────────────────────────────────────
-//    void HandleMovement()
-//    {
-//        bool left = moveLeft || Input.GetKey(KeyCode.LeftArrow);
-//        bool right = moveRight || Input.GetKey(KeyCode.RightArrow);
-
-//        if (right)
+//        if (isRunning)
 //        {
-//            // ✅ Move worldX forward (BackgroundScroller reads anchoredPosition.x)
-//            worldX = Mathf.Min(worldX + moveSpeed * Time.deltaTime, maxX);
-//            cowRect.anchoredPosition = new Vector2(worldX, cowRect.anchoredPosition.y);
-//            cowRect.localScale = new Vector3(1f, 1f, 1f);
-//        }
-//        else if (left)
-//        {
-//            worldX = Mathf.Max(worldX - moveSpeed * Time.deltaTime, minX);
-//            cowRect.anchoredPosition = new Vector2(worldX, cowRect.anchoredPosition.y);
-//            cowRect.localScale = new Vector3(-1f, 1f, 1f);
+//            if (!isJumping)
+//                worldX += runSpeed * Time.deltaTime;
+
+//            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+//                PlayJump();
 //        }
 //    }
 
-//    void HandleAnimationSwitch()
+//    // ──────────────────────────────────────────────────────────
+//    public void StartRunning()
 //    {
-//        if (currentState == CowState.Hit) return;
-//        if (currentState == CowState.Jump) return;
-
-//        bool moving = moveLeft || moveRight ||
-//                      Input.GetKey(KeyCode.LeftArrow) ||
-//                      Input.GetKey(KeyCode.RightArrow);
-
-//        if (moving && currentState != CowState.SideRun) SetState(CowState.SideRun);
-//        if (!moving && currentState == CowState.SideRun) SetState(CowState.Idle);
+//        isRunning = true;
+//        jumpsLeft = maxJumps;   // ✅ reset on game start
+//        SetState(CowState.Run);
+//        Debug.Log("[Cow] StartRunning!");
 //    }
 
-//    // ─────────────────────────────────────────────────────────
-//    // Public methods
-//    // ─────────────────────────────────────────────────────────
-//    public void PlayIdle() { if (!isAlive) return; SetState(CowState.Idle); }
-//    public void PlayJump() { if (!isAlive || currentState == CowState.Win) return; SetState(CowState.Jump); }
-//    public void PlayHit() { if (!isAlive || currentState == CowState.Hit || currentState == CowState.Win) return; SetState(CowState.Hit); }
-//    public void PlayWin() { if (!isAlive) return; Debug.Log("[Cow] PlayWin called!"); SetState(CowState.Win); }
+//    public void StopRunning() => isRunning = false;
 
-//    public void OnRightDown() => moveRight = true;
-//    public void OnRightUp() => moveRight = false;
-//    public void OnLeftDown() => moveLeft = true;
-//    public void OnLeftUp() => moveLeft = false;
+//    // ──────────────────────────────────────────────────────────
+//    public void PlayJump()
+//    {
+//        if (!isAlive) return;
+//        if (CurrentState == CowState.Win) return;
+//        if (CurrentState == CowState.Hit) return;
 
-//    // ─────────────────────────────────────────────────────────
+//        // ✅ Allow jump only if jumpsLeft > 0
+//        if (jumpsLeft <= 0) return;
+
+//        jumpsLeft--;
+//        Debug.Log($"[Cow] Jump! Jumps left: {jumpsLeft}");
+
+//        // ✅ Restart arc from CURRENT Y position for double jump feel
+//        if (jumpArcCo != null) StopCoroutine(jumpArcCo);
+//        jumpArcCo = StartCoroutine(JumpArc());
+
+//        SetState(CowState.Jump);
+//    }
+
+//    public void OnJumpPressed() => PlayJump();
+//    public void OnJumpDown() => PlayJump();
+
+//    public void PlayHit()
+//    {
+//        if (!isAlive) return;
+//        if (CurrentState == CowState.Hit) return;
+//        if (CurrentState == CowState.Win) return;
+//        hitThenWin = false;
+//        SetState(CowState.Hit);
+//    }
+
+//    public void PlayHitThenWin()
+//    {
+//        if (!isAlive) return;
+//        if (CurrentState == CowState.Win) return;
+//        Debug.Log("[Cow] PlayHitThenWin!");
+//        hitThenWin = true;
+//        isRunning = false;
+//        SetState(CowState.Hit);
+//    }
+
+//    // ──────────────────────────────────────────────────────────
+//    // JumpArc — arcs from CURRENT Y so double jump stacks naturally
+//    // ──────────────────────────────────────────────────────────
+//    IEnumerator JumpArc()
+//    {
+//        isJumping = true;
+
+//        float elapsed = 0f;
+//        float startY = cowRect.anchoredPosition.y;   // ✅ start from wherever cow is now
+//        float peakY = startY + jumpHeight;
+
+//        while (elapsed < jumpDuration)
+//        {
+//            if (!isAlive) yield break;
+
+//            elapsed += Time.deltaTime;
+//            float t = Mathf.Clamp01(elapsed / jumpDuration);
+
+//            // ✅ Move forward faster than run
+//            worldX += jumpForwardSpeed * Time.deltaTime;
+
+//            // ✅ Parabola from startY → peak → groundY
+//            float height = Mathf.Lerp(startY, groundY, t) + jumpHeight * 4f * t * (1f - t);
+//            cowRect.anchoredPosition = new Vector2(
+//                cowRect.anchoredPosition.x,
+//                height
+//            );
+
+//            yield return null;
+//        }
+
+//        // Snap to ground
+//        cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, groundY);
+//        isJumping = false;
+//        jumpsLeft = maxJumps;   // ✅ reset jumps when landed
+//        jumpArcCo = null;
+//        Debug.Log("[Cow] Landed! Jumps reset.");
+//    }
+
+//    // ──────────────────────────────────────────────────────────
 //    void SetState(CowState newState)
 //    {
 //        if (!isAlive) return;
-//        currentState = newState;
-//        Debug.Log($"[Cow] State → {newState}");
-//        StopAllCoroutines();
-//        StartCoroutine(MasterLoop());
+//        CurrentState = newState;
+//        Debug.Log($"[Cow] → {newState}");
+
+//        if (animLoop != null) StopCoroutine(animLoop);
+//        animLoop = StartCoroutine(MasterLoop());
 //    }
 
 //    IEnumerator MasterLoop()
@@ -414,10 +1895,10 @@
 //            Sprite[] frames = null;
 //            float fps = 12f;
 
-//            switch (currentState)
+//            switch (CurrentState)
 //            {
 //                case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
-//                case CowState.SideRun: frames = sideRunFrames; fps = sideRunFPS; break;
+//                case CowState.Run: frames = runFrames; fps = runFPS; break;
 //                case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
 //                case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
 //                case CowState.Win: frames = winFrames; fps = winFPS; break;
@@ -425,51 +1906,74 @@
 
 //            if (frames == null || frames.Length == 0)
 //            {
-//                Debug.LogError($"[Cow] {currentState} frames are EMPTY!");
+//                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
 //                yield return new WaitForSeconds(0.1f);
 //                continue;
 //            }
 
 //            if (frame >= frames.Length) frame = 0;
-
 //            cowImage.sprite = frames[frame];
 //            cowRect.sizeDelta = originalSize;
 //            frame++;
 
-//            if (currentState == CowState.Hit && frame >= frames.Length)
-//            { frame = 0; currentState = CowState.Idle; }
+//            // Jump → ONCE → back to Run
+//            if (CurrentState == CowState.Jump && frame >= frames.Length)
+//            {
+//                frame = 0;
+//                CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//            }
 
-//            if (currentState == CowState.Jump && frame >= frames.Length)
-//            { frame = 0; currentState = CowState.Idle; }
+//            // Hit → ONCE → Win or Run
+//            if (CurrentState == CowState.Hit && frame >= frames.Length)
+//            {
+//                frame = 0;
+//                if (hitThenWin)
+//                {
+//                    hitThenWin = false;
+//                    CurrentState = CowState.Win;
+//                    Debug.Log("[Cow] → Celebration!");
+//                }
+//                else
+//                {
+//                    CurrentState = isRunning ? CowState.Run : CowState.Idle;
+//                }
+//            }
 
 //            if (frame >= frames.Length) frame = 0;
-
 //            yield return new WaitForSeconds(1f / fps);
 //        }
 //    }
 //}
 
-
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class CowAnimationController : MonoBehaviour
+public class Cowanimationcontroller : MonoBehaviour
 {
-    public enum CowState { Idle, SideRun, Jump, Hit, Win }
+    public enum CowState { Idle, Run, Jump, Hit, Win }
 
-    [Header("Movement")]
-    public float moveSpeed = 200f;
-    public float minX = 0f;       // world left limit
-    public float maxX = 9000f;    // world right limit
+    [Header("Auto Run")]
+    public float runSpeed = 200f;
+
+    [Header("Jump Physics")]
+    public float jumpHeight = 250f;  // pixels — how high
+    public float jumpDuration = 0.7f;  // seconds — time in air
+    public float jumpForwardSpeed = 400f; // pixels/sec forward during jump
+    public int maxJumps = 2;     // 1 = single jump, 2 = double jump
+
+    [Header("Jump Size")]
+    [Tooltip("1 = same size as run/idle.  1.3 = 30% bigger.  Drag to match your jump sprites.")]
+    [Range(0.5f, 3f)]
+    public float jumpScale = 1f;
 
     [Header("Idle Animation")]
     public Sprite[] idleFrames;
     public float idleFPS = 12f;
 
-    [Header("Side Run Animation")]
-    public Sprite[] sideRunFrames;
-    public float sideRunFPS = 12f;
+    [Header("Run Animation")]
+    public Sprite[] runFrames;
+    public float runFPS = 12f;
 
     [Header("Jump Animation")]
     public Sprite[] jumpFrames;
@@ -479,31 +1983,37 @@ public class CowAnimationController : MonoBehaviour
     public Sprite[] hitFrames;
     public float hitFPS = 12f;
 
-    [Header("Win Animation")]
+    [Header("Win / Celebration Animation")]
     public Sprite[] winFrames;
     public float winFPS = 12f;
 
+    // ── Private ────────────────────────────────────────────────
     private Image cowImage;
     private RectTransform cowRect;
     private Vector2 originalSize;
-    private CowState currentState = CowState.Idle;
     private bool isAlive = false;
+    private bool hitThenWin = false;
+    private float groundY;
+    private bool isJumping = false;
+    private int jumpsLeft = 0;
 
-    private bool moveLeft = false;
-    private bool moveRight = false;
+    private Coroutine animLoop = null;
+    private Coroutine jumpArcCo = null;
 
-    // ✅ worldX is the cow's TRUE logical position
-    // BackgroundScroller reads this and decides where to draw the cow on screen
+    public CowState CurrentState { get; private set; } = CowState.Idle;
+
     [HideInInspector] public float worldX = 0f;
+    [HideInInspector] public bool isRunning = false;
 
-    // ─────────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────
     void Start()
     {
         isAlive = true;
         cowImage = GetComponent<Image>();
         cowRect = GetComponent<RectTransform>();
         originalSize = cowRect.sizeDelta;
-        worldX = cowRect.anchoredPosition.x;   // start at whatever position it's placed
+        worldX = cowRect.anchoredPosition.x;
+        groundY = cowRect.anchoredPosition.y;
         SetState(CowState.Idle);
     }
 
@@ -511,69 +2021,141 @@ public class CowAnimationController : MonoBehaviour
     void OnDisable() { isAlive = false; StopAllCoroutines(); }
     void OnEnable() { if (cowImage != null && cowRect != null) isAlive = true; }
 
+    // ──────────────────────────────────────────────────────────
     void Update()
     {
         if (!isAlive) return;
-        if (currentState == CowState.Win) return;
+        if (CurrentState == CowState.Win) return;
+        if (CurrentState == CowState.Hit) return;
 
-        HandleMovement();
-        HandleAnimationSwitch();
-    }
-
-    // ─────────────────────────────────────────────────────────
-    // Only updates worldX — BackgroundScroller sets anchoredPosition
-    // ─────────────────────────────────────────────────────────
-    void HandleMovement()
-    {
-        bool left = moveLeft || Input.GetKey(KeyCode.LeftArrow);
-        bool right = moveRight || Input.GetKey(KeyCode.RightArrow);
-
-        if (right)
+        if (isRunning)
         {
-            worldX = Mathf.Min(worldX + moveSpeed * Time.deltaTime, maxX);
-            cowRect.localScale = new Vector3(1f, 1f, 1f);
-        }
-        else if (left)
-        {
-            worldX = Mathf.Max(worldX - moveSpeed * Time.deltaTime, minX);
-            cowRect.localScale = new Vector3(-1f, 1f, 1f);
+            if (!isJumping)
+                worldX += runSpeed * Time.deltaTime;
+
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow))
+                PlayJump();
         }
     }
 
-    void HandleAnimationSwitch()
+    // ──────────────────────────────────────────────────────────
+    public void StartRunning()
     {
-        if (currentState == CowState.Hit) return;
-        if (currentState == CowState.Jump) return;
-
-        bool moving = moveLeft || moveRight ||
-                      Input.GetKey(KeyCode.LeftArrow) ||
-                      Input.GetKey(KeyCode.RightArrow);
-
-        if (moving && currentState != CowState.SideRun) SetState(CowState.SideRun);
-        if (!moving && currentState == CowState.SideRun) SetState(CowState.Idle);
+        isRunning = true;
+        jumpsLeft = maxJumps;
+        SetState(CowState.Run);
+        Debug.Log("[Cow] StartRunning!");
     }
 
-    // ─────────────────────────────────────────────────────────
-    // Public methods
-    // ─────────────────────────────────────────────────────────
-    public void PlayIdle() { if (!isAlive) return; SetState(CowState.Idle); }
-    public void PlayJump() { if (!isAlive || currentState == CowState.Win) return; SetState(CowState.Jump); }
-    public void PlayHit() { if (!isAlive || currentState == CowState.Hit || currentState == CowState.Win) return; SetState(CowState.Hit); }
-    public void PlayWin() { if (!isAlive) return; Debug.Log("[Cow] PlayWin called!"); SetState(CowState.Win); }
+    public void StopRunning()
+    {
+        isRunning = false;
+    }
 
-    public void OnRightDown() => moveRight = true;
-    public void OnRightUp() => moveRight = false;
-    public void OnLeftDown() => moveLeft = true;
-    public void OnLeftUp() => moveLeft = false;
+    // ──────────────────────────────────────────────────────────
+    public void PlayJump()
+    {
+        if (!isAlive) return;
+        if (CurrentState == CowState.Win) return;
+        if (CurrentState == CowState.Hit) return;
+        if (jumpsLeft <= 0) return;
 
-    // ─────────────────────────────────────────────────────────
+        jumpsLeft--;
+        Debug.Log($"[Cow] Jump! Jumps left: {jumpsLeft}");
+
+        if (jumpArcCo != null) StopCoroutine(jumpArcCo);
+        jumpArcCo = StartCoroutine(JumpArc());
+
+        SetState(CowState.Jump);
+    }
+
+    public void OnJumpPressed() => PlayJump();
+    public void OnJumpDown() => PlayJump();
+
+    // ──────────────────────────────────────────────────────────
+    // Called by ObstacleController when cow hits an obstacle
+    // ──────────────────────────────────────────────────────────
+    public void PlayHit()
+    {
+        if (!isAlive) return;
+        if (CurrentState == CowState.Hit) return;
+        if (CurrentState == CowState.Win) return;
+
+        // Stop any jump in progress
+        if (jumpArcCo != null)
+        {
+            StopCoroutine(jumpArcCo);
+            jumpArcCo = null;
+        }
+        isJumping = false;
+        isRunning = false;
+
+        hitThenWin = false;
+        SetState(CowState.Hit);
+    }
+
+    // Called by BellTrigger — Hit once then Win celebration
+    public void PlayHitThenWin()
+    {
+        if (!isAlive) return;
+        if (CurrentState == CowState.Win) return;
+
+        if (jumpArcCo != null) { StopCoroutine(jumpArcCo); jumpArcCo = null; }
+        isJumping = false;
+        isRunning = false;
+        hitThenWin = true;
+        SetState(CowState.Hit);
+        Debug.Log("[Cow] PlayHitThenWin!");
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Jump arc — parabola from current Y back to groundY
+    // ──────────────────────────────────────────────────────────
+    IEnumerator JumpArc()
+    {
+        isJumping = true;
+
+        float elapsed = 0f;
+        float startY = cowRect.anchoredPosition.y;
+
+        while (elapsed < jumpDuration)
+        {
+            if (!isAlive) yield break;
+            if (CurrentState == CowState.Hit) yield break; // stop arc on hit
+
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / jumpDuration);
+
+            worldX += jumpForwardSpeed * Time.deltaTime;
+
+            // Parabola: startY → peak → groundY
+            float height = Mathf.Lerp(startY, groundY, t) + jumpHeight * 4f * t * (1f - t);
+            cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, height);
+
+            yield return null;
+        }
+
+        // Snap to ground and reset
+        cowRect.anchoredPosition = new Vector2(cowRect.anchoredPosition.x, groundY);
+        isJumping = false;
+        jumpsLeft = maxJumps;
+        jumpArcCo = null;
+
+        if (CurrentState == CowState.Jump)
+            SetState(isRunning ? CowState.Run : CowState.Idle);
+
+        Debug.Log("[Cow] Landed!");
+    }
+
+    // ──────────────────────────────────────────────────────────
     void SetState(CowState newState)
     {
         if (!isAlive) return;
-        currentState = newState;
-        Debug.Log($"[Cow] State → {newState}");
-        StopAllCoroutines();
-        StartCoroutine(MasterLoop());
+        CurrentState = newState;
+        Debug.Log($"[Cow] → {newState}");
+
+        if (animLoop != null) StopCoroutine(animLoop);
+        animLoop = StartCoroutine(MasterLoop());
     }
 
     IEnumerator MasterLoop()
@@ -586,10 +2168,10 @@ public class CowAnimationController : MonoBehaviour
             Sprite[] frames = null;
             float fps = 12f;
 
-            switch (currentState)
+            switch (CurrentState)
             {
                 case CowState.Idle: frames = idleFrames; fps = idleFPS; break;
-                case CowState.SideRun: frames = sideRunFrames; fps = sideRunFPS; break;
+                case CowState.Run: frames = runFrames; fps = runFPS; break;
                 case CowState.Jump: frames = jumpFrames; fps = jumpFPS; break;
                 case CowState.Hit: frames = hitFrames; fps = hitFPS; break;
                 case CowState.Win: frames = winFrames; fps = winFPS; break;
@@ -597,7 +2179,7 @@ public class CowAnimationController : MonoBehaviour
 
             if (frames == null || frames.Length == 0)
             {
-                Debug.LogError($"[Cow] {currentState} frames are EMPTY!");
+                Debug.LogError($"[Cow] {CurrentState} frames EMPTY!");
                 yield return new WaitForSeconds(0.1f);
                 continue;
             }
@@ -605,14 +2187,37 @@ public class CowAnimationController : MonoBehaviour
             if (frame >= frames.Length) frame = 0;
 
             cowImage.sprite = frames[frame];
-            cowRect.sizeDelta = originalSize;
+
+            // Apply jumpScale only during Jump
+            cowRect.sizeDelta = (CurrentState == CowState.Jump)
+                ? originalSize * jumpScale
+                : originalSize;
+
             frame++;
 
-            if (currentState == CowState.Hit && frame >= frames.Length)
-            { frame = 0; currentState = CowState.Idle; }
+            // Jump → plays once → handled by JumpArc landing
+            if (CurrentState == CowState.Jump && frame >= frames.Length)
+            {
+                frame = 0;
+                // Keep looping jump frames until JumpArc finishes
+            }
 
-            if (currentState == CowState.Jump && frame >= frames.Length)
-            { frame = 0; currentState = CowState.Idle; }
+            // Hit → plays once → Win or Idle
+            if (CurrentState == CowState.Hit && frame >= frames.Length)
+            {
+                frame = 0;
+                if (hitThenWin)
+                {
+                    hitThenWin = false;
+                    CurrentState = CowState.Win;
+                    Debug.Log("[Cow] → Celebration!");
+                }
+                else
+                {
+                    // Game over — stay in Hit / Idle, GameManager handles panel
+                    CurrentState = CowState.Idle;
+                }
+            }
 
             if (frame >= frames.Length) frame = 0;
 
