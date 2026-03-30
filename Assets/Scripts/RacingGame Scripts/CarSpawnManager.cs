@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class CarSpawnManager : MonoBehaviour
 {
@@ -17,9 +18,11 @@ public class CarSpawnManager : MonoBehaviour
 
     [Header("Player")]
     public RectTransform playerObject;
+    public RectTransform pImage;           // Assign PImage from PlayerObject in Inspector
 
     [Header("Game Over")]
     public GameObject gameOverPanel;
+    public GameObject crashEffect;         // Assign the CRASH! sprite GameObject in Inspector
 
     [Header("Road Lines")]
     public GameObject[] roadLines;
@@ -29,7 +32,10 @@ public class CarSpawnManager : MonoBehaviour
     public RectTransform finishLineTarget;
     public GameObject youWinPanel;
     public float moveToFinishSpeed = 0.5f;
-    public Vector3 playerEndScale = new Vector3(0.1f, 0.1f, 0.1f); // X Y Z from Inspector
+    public Vector3 playerEndScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+    [Header("Position UI")]
+    public TextMeshProUGUI positionText;
 
     private float spawnTimer = 0f;
     private bool isGameOver = false;
@@ -38,6 +44,9 @@ public class CarSpawnManager : MonoBehaviour
     private bool allSpawned = false;
     private bool winTriggered = false;
     private int[] carSpawnerIndex;
+
+    // Position tracking
+    private int carsPassed = 0;
 
     void Start()
     {
@@ -53,11 +62,20 @@ public class CarSpawnManager : MonoBehaviour
 
         if (youWinPanel != null)
             youWinPanel.SetActive(false);
+
+        // CRASH effect starts hidden
+        if (crashEffect != null)
+            crashEffect.SetActive(false);
+
+        UpdatePositionText();
     }
 
     void Update()
     {
         if (isGameOver) return;
+
+        UpdatePositionText();
+
         if (allSpawned) return;
 
         spawnTimer += Time.deltaTime;
@@ -66,6 +84,20 @@ public class CarSpawnManager : MonoBehaviour
             spawnTimer = 0f;
             SpawnNextCar();
         }
+    }
+
+    public void OnCarPassedPlayer()
+    {
+        carsPassed++;
+    }
+
+    void UpdatePositionText()
+    {
+        if (positionText == null) return;
+
+        int playerPosition = totalCarsToSpawn - carsPassed;
+        playerPosition = Mathf.Max(1, playerPosition);
+        positionText.text = playerPosition + "/" + totalCarsToSpawn;
     }
 
     void SpawnNextCar()
@@ -92,11 +124,14 @@ public class CarSpawnManager : MonoBehaviour
         spawnedCount++;
 
         ObstacleMover mover = car.GetComponent<ObstacleMover>();
-        mover.startSpawner  = start;
-        mover.endSpawner    = end;
-        mover.playerObject  = playerObject;
-        mover.gameOverPanel = gameOverPanel;
-        mover.onCarFinished = () => OnCarFinished(freeCar);
+        mover.startSpawner      = start;
+        mover.endSpawner        = end;
+        mover.playerObject      = playerObject;
+        mover.pImage            = pImage;           // pass PImage
+        mover.gameOverPanel     = gameOverPanel;
+        mover.crashEffect       = crashEffect;      // pass CRASH sprite
+        mover.onCarFinished     = () => OnCarFinished(freeCar);
+        mover.onCarPassedPlayer = () => OnCarPassedPlayer();
         mover.ResetCar();
     }
 

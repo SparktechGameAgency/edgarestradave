@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class ObstacleMover : MonoBehaviour
 {
@@ -15,12 +16,17 @@ public class ObstacleMover : MonoBehaviour
     public float speed = 0.3f;
 
     [HideInInspector] public RectTransform playerObject;
+    [HideInInspector] public RectTransform pImage;
+    [HideInInspector] public RectTransform cImage;
     [HideInInspector] public GameObject gameOverPanel;
+    [HideInInspector] public GameObject crashEffect;
     [HideInInspector] public Action onCarFinished;
+    [HideInInspector] public Action onCarPassedPlayer;
 
     private RectTransform rectTransform;
     private float progress = 0f;
     private bool isGameOver = false;
+    private bool hasPassedPlayer = false;
 
     void Awake()
     {
@@ -29,10 +35,25 @@ public class ObstacleMover : MonoBehaviour
 
     public void ResetCar()
     {
-        progress               = 0f;
-        isGameOver             = false;
+        progress          = 0f;
+        isGameOver        = false;
+        hasPassedPlayer   = false;
+
         rectTransform.position = startSpawner.position;
         transform.localScale   = Vector3.one * startScale;
+
+        // Find CImage recursively
+        Transform found = FindDeep(transform, "CImage");
+        if (found != null)
+        {
+            cImage = found.GetComponent<RectTransform>();
+            Debug.Log(gameObject.name + " → CImage found at: " + GetPath(found));
+        }
+        else
+        {
+            cImage = null;
+            Debug.LogWarning(gameObject.name + " → CImage NOT FOUND — skipping collision.");
+        }
     }
 
     void Update()
@@ -52,35 +73,38 @@ public class ObstacleMover : MonoBehaviour
         float currentScale   = Mathf.Lerp(startScale, endScale, progress);
         transform.localScale = Vector3.one * currentScale;
 
-        // Only check collision when car is close to player (progress > 0.75)
         if (progress > 0.75f)
             CheckCollision();
 
         if (progress >= 1f)
+        {
+            if (!hasPassedPlayer)
+            {
+                hasPassedPlayer = true;
+                onCarPassedPlayer?.Invoke();
+            }
             onCarFinished?.Invoke();
+        }
     }
 
     void CheckCollision()
     {
-        if (playerObject == null) return;
+        if (pImage == null || cImage == null) return;
 
-        Rect carRect    = GetWorldRect(rectTransform);
-        Rect playerRect = GetWorldRect(playerObject);
+        Rect playerRect = GetFullRect(pImage);
+        Rect carRect    = GetFullRect(cImage);
 
         if (carRect.Overlaps(playerRect))
             TriggerGameOver();
     }
 
-    Rect GetWorldRect(RectTransform rt)
+    Rect GetFullRect(RectTransform rt)
     {
-        Vector3[] corners = new Vector3[4];
-        rt.GetWorldCorners(corners);
-        return new Rect(
-            corners[0].x,
-            corners[0].y,
-            corners[2].x - corners[0].x,
-            corners[2].y - corners[0].y
-        );
+        float w = rt.sizeDelta.x * rt.lossyScale.x;
+        float h = rt.sizeDelta.y * rt.lossyScale.y;
+        float x = rt.position.x - w * rt.pivot.x;
+        float y = rt.position.y - h * rt.pivot.y;
+        return new Rect(x, y, w, h);
     }
 
     void TriggerGameOver()
@@ -88,9 +112,65 @@ public class ObstacleMover : MonoBehaviour
         if (isGameOver) return;
         isGameOver = true;
 
+        Vector3 crashPos = (pImage.position + cImage.position) / 2f;
+        crashPos.z = 0f;
+
+        StartCoroutine(ShowCrashThenGameOver(crashPos));
+    }
+
+    IEnumerator ShowCrashThenGameOver(Vector3 crashPos)
+    {
+        if (crashEffect != null)
+        {
+            RectTransform crashRT = crashEffect.GetComponent<RectTransform>();
+            if (crashRT != null)
+                crashRT.position = crashPos;
+            else
+                crashEffect.transform.position = crashPos;
+
+            crashEffect.SetActive(true);
+        }
+
+        yield return new WaitForSecondsRealtime(0.8f);
+
+        if (crashEffect != null)
+            crashEffect.SetActive(false);
+
         if (gameOverPanel != null)
+        {
+            RectTransform rt = gameOverPanel.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+            }
             gameOverPanel.SetActive(true);
+        }
 
         Time.timeScale = 0f;
+    }
+
+    Transform FindDeep(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name) return child;
+            Transform result = FindDeep(child, name);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
+    string GetPath(Transform t)
+    {
+        string path = t.name;
+        while (t.parent != null)
+        {
+            t = t.parent;
+            path = t.name + "/" + path;
+        }
+        return path;
     }
 }
