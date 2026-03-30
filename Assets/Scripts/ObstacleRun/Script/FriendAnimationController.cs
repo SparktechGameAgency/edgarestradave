@@ -14,7 +14,7 @@ public class FriendAnimationController : MonoBehaviour
     void Start()
     {
         friendImage = GetComponent<Image>();
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     // =========================
