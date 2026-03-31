@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 509240163}
   - component: {fileID: 509240162}
   m_Layer: 5
-  m_Name: AllColor
+  m_Name: AllParts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2558,7 +2558,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   allPanel: []
   congratsPanel: {fileID: 2036611092}
-  pulsingObject: {fileID: 1984590062}
+  congratsPulsingObject: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  gameOverPulsingObject: {fileID: 0}
   dogController: {fileID: 1365732522}
   allDropAreas: []
   allRepairSlots:
@@ -2568,6 +2570,13 @@ MonoBehaviour:
   - {fileID: 943198761}
   - {fileID: 580261775}
   - {fileID: 1661245153}
+  cow: {fileID: 0}
+  startButton: {fileID: 0}
+  instruction: {fileID: 0}
+  startButtonPulsingObject: {fileID: 0}
+  countdownText: {fileID: 0}
+  allCleaningZones: []
+  allTools: []
 --- !u!4 &1863244380
 Transform:
   m_ObjectHideFlags: 0

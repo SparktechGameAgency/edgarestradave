@@ -1,16 +1,6 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
-/// <summary>
-/// Attach to any UI GameObject to make it pulse continuously.
-/// Works on: Start Button text, Game Over text, Congrats text, icons, panels — anything.
-///
-/// Inspector settings:
-///   Scale Amount  → how big it grows (1.15 = 15% bigger at peak)
-///   Speed         → seconds per pulse cycle (lower = faster)
-///   Delay         → seconds before pulsing starts
-///   Punch instead → one-shot punch scale instead of looping (good for "GO!!" text)
-/// </summary>
 public class UIPulse : MonoBehaviour
 {
     [Header("Pulse Settings")]
