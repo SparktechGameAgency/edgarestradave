@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ObstacleMover : MonoBehaviour
 {
@@ -15,15 +16,19 @@ public class ObstacleMover : MonoBehaviour
     [Header("Speed")]
     public float speed = 0.3f;
 
+    [Header("Collision")]
+    public float collisionDistanceX = 200f;
+    public float collisionDistanceY = 300f;
+
     [HideInInspector] public RectTransform playerObject;
-    [HideInInspector] public RectTransform pImage;
-    [HideInInspector] public RectTransform cImage;
+    [HideInInspector] public List<RectTransform> playerCPoints;
     [HideInInspector] public GameObject gameOverPanel;
     [HideInInspector] public GameObject crashEffect;
     [HideInInspector] public Action onCarFinished;
     [HideInInspector] public Action onCarPassedPlayer;
 
     private RectTransform rectTransform;
+    private List<RectTransform> carCPoints = new List<RectTransform>();
     private float progress = 0f;
     private bool isGameOver = false;
     private bool hasPassedPlayer = false;
@@ -35,24 +40,27 @@ public class ObstacleMover : MonoBehaviour
 
     public void ResetCar()
     {
-        progress          = 0f;
-        isGameOver        = false;
-        hasPassedPlayer   = false;
+        progress        = 0f;
+        isGameOver      = false;
+        hasPassedPlayer = false;
 
         rectTransform.position = startSpawner.position;
         transform.localScale   = Vector3.one * startScale;
 
-        // Find CImage recursively
-        Transform found = FindDeep(transform, "CImage");
-        if (found != null)
+        carCPoints.Clear();
+        FindAllCPoints(transform, carCPoints);
+    }
+
+    void FindAllCPoints(Transform parent, List<RectTransform> result)
+    {
+        foreach (Transform child in parent)
         {
-            cImage = found.GetComponent<RectTransform>();
-            Debug.Log(gameObject.name + " → CImage found at: " + GetPath(found));
-        }
-        else
-        {
-            cImage = null;
-            Debug.LogWarning(gameObject.name + " → CImage NOT FOUND — skipping collision.");
+            if (child.name.StartsWith("C"))
+            {
+                RectTransform rt = child.GetComponent<RectTransform>();
+                if (rt != null) result.Add(rt);
+            }
+            FindAllCPoints(child, result);
         }
     }
 
@@ -73,7 +81,7 @@ public class ObstacleMover : MonoBehaviour
         float currentScale   = Mathf.Lerp(startScale, endScale, progress);
         transform.localScale = Vector3.one * currentScale;
 
-        if (progress > 0.75f)
+        if (progress > 0.3f)
             CheckCollision();
 
         if (progress >= 1f)
@@ -89,32 +97,35 @@ public class ObstacleMover : MonoBehaviour
 
     void CheckCollision()
     {
-        if (pImage == null || cImage == null) return;
+        if (playerCPoints == null || playerCPoints.Count == 0) return;
+        if (carCPoints == null || carCPoints.Count == 0) return;
 
-        Rect playerRect = GetFullRect(pImage);
-        Rect carRect    = GetFullRect(cImage);
+        foreach (RectTransform carC in carCPoints)
+        {
+            if (carC == null) continue;
 
-        if (carRect.Overlaps(playerRect))
-            TriggerGameOver();
+            foreach (RectTransform playerC in playerCPoints)
+            {
+                if (playerC == null) continue;
+
+                float dx = Mathf.Abs(carC.position.x - playerC.position.x);
+                float dy = Mathf.Abs(carC.position.y - playerC.position.y);
+
+                if (dx <= collisionDistanceX && dy <= collisionDistanceY)
+                {
+                    Vector3 crashPos = (carC.position + playerC.position) / 2f;
+                    crashPos.z = 0f;
+                    TriggerGameOver(crashPos);
+                    return;
+                }
+            }
+        }
     }
 
-    Rect GetFullRect(RectTransform rt)
-    {
-        float w = rt.sizeDelta.x * rt.lossyScale.x;
-        float h = rt.sizeDelta.y * rt.lossyScale.y;
-        float x = rt.position.x - w * rt.pivot.x;
-        float y = rt.position.y - h * rt.pivot.y;
-        return new Rect(x, y, w, h);
-    }
-
-    void TriggerGameOver()
+    void TriggerGameOver(Vector3 crashPos)
     {
         if (isGameOver) return;
         isGameOver = true;
-
-        Vector3 crashPos = (pImage.position + cImage.position) / 2f;
-        crashPos.z = 0f;
-
         StartCoroutine(ShowCrashThenGameOver(crashPos));
     }
 
@@ -131,7 +142,7 @@ public class ObstacleMover : MonoBehaviour
             crashEffect.SetActive(true);
         }
 
-        yield return new WaitForSecondsRealtime(0.8f);
+        yield return new WaitForSecondsRealtime(2f);
 
         if (crashEffect != null)
             crashEffect.SetActive(false);
@@ -150,27 +161,5 @@ public class ObstacleMover : MonoBehaviour
         }
 
         Time.timeScale = 0f;
-    }
-
-    Transform FindDeep(Transform parent, string name)
-    {
-        foreach (Transform child in parent)
-        {
-            if (child.name == name) return child;
-            Transform result = FindDeep(child, name);
-            if (result != null) return result;
-        }
-        return null;
-    }
-
-    string GetPath(Transform t)
-    {
-        string path = t.name;
-        while (t.parent != null)
-        {
-            t = t.parent;
-            path = t.name + "/" + path;
-        }
-        return path;
     }
 }

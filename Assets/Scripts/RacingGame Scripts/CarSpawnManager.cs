@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 
 public class CarSpawnManager : MonoBehaviour
@@ -18,21 +19,28 @@ public class CarSpawnManager : MonoBehaviour
 
     [Header("Player")]
     public RectTransform playerObject;
-    public RectTransform pImage;           // Assign PImage from PlayerObject in Inspector
 
     [Header("Game Over")]
     public GameObject gameOverPanel;
-    public GameObject crashEffect;         // Assign the CRASH! sprite GameObject in Inspector
+    public GameObject crashEffect;
 
     [Header("Road Lines")]
     public GameObject[] roadLines;
 
     [Header("Win Settings")]
     public GameObject finishLineObject;
+    public GameObject finishLineMover;
     public RectTransform finishLineTarget;
     public GameObject youWinPanel;
     public float moveToFinishSpeed = 0.5f;
     public Vector3 playerEndScale = new Vector3(0.1f, 0.1f, 0.1f);
+    public float youWinDelay = 5f;
+
+    [Header("BGHouses Grow")]
+    public RectTransform bgHouses;
+    public Vector3 bgHousesStartScale  = new Vector3(0.1f, 0.1f, 0.1f);
+    public Vector3 bgHousesEndScale    = new Vector3(1f, 1f, 1f);
+    public float bgHousesSmoothSpeed   = 2f; // Higher = faster smooth transition
 
     [Header("Position UI")]
     public TextMeshProUGUI positionText;
@@ -44,9 +52,12 @@ public class CarSpawnManager : MonoBehaviour
     private bool allSpawned = false;
     private bool winTriggered = false;
     private int[] carSpawnerIndex;
-
-    // Position tracking
     private int carsPassed = 0;
+    private int nextCarIndex = 0;
+
+    private List<RectTransform> playerCPoints = new List<RectTransform>();
+
+    private Coroutine bgHousesCoroutine;
 
     void Start()
     {
@@ -60,14 +71,44 @@ public class CarSpawnManager : MonoBehaviour
         if (finishLineObject != null)
             finishLineObject.SetActive(false);
 
+        if (finishLineMover != null)
+            finishLineMover.SetActive(false);
+
         if (youWinPanel != null)
             youWinPanel.SetActive(false);
 
-        // CRASH effect starts hidden
         if (crashEffect != null)
             crashEffect.SetActive(false);
 
+        if (bgHouses != null)
+            bgHouses.localScale = bgHousesStartScale;
+
+        CollectPlayerCPoints();
         UpdatePositionText();
+    }
+
+    void CollectPlayerCPoints()
+    {
+        playerCPoints.Clear();
+        FindAllCPoints(playerObject, playerCPoints);
+
+        if (playerCPoints.Count == 0)
+            Debug.LogWarning("CarSpawnManager → No C points found on PlayerObject!");
+        else
+            Debug.Log("CarSpawnManager → Found " + playerCPoints.Count + " player C points.");
+    }
+
+    void FindAllCPoints(Transform parent, List<RectTransform> result)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name.StartsWith("C"))
+            {
+                RectTransform rt = child.GetComponent<RectTransform>();
+                if (rt != null) result.Add(rt);
+            }
+            FindAllCPoints(child, result);
+        }
     }
 
     void Update()
@@ -94,10 +135,31 @@ public class CarSpawnManager : MonoBehaviour
     void UpdatePositionText()
     {
         if (positionText == null) return;
-
-        int playerPosition = totalCarsToSpawn - carsPassed;
-        playerPosition = Mathf.Max(1, playerPosition);
+        int playerPosition = Mathf.Max(1, totalCarsToSpawn - carsPassed);
         positionText.text = playerPosition + "/" + totalCarsToSpawn;
+    }
+
+    void SmoothBGHousesToScale(Vector3 targetScale)
+    {
+        if (bgHouses == null) return;
+        if (bgHousesCoroutine != null)
+            StopCoroutine(bgHousesCoroutine);
+        bgHousesCoroutine = StartCoroutine(BGHousesScaleCoroutine(targetScale));
+    }
+
+    IEnumerator BGHousesScaleCoroutine(Vector3 targetScale)
+    {
+        Vector3 fromScale = bgHouses.localScale;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * bgHousesSmoothSpeed;
+            bgHouses.localScale = Vector3.Lerp(fromScale, targetScale, Mathf.SmoothStep(0f, 1f, t));
+            yield return null;
+        }
+
+        bgHouses.localScale = targetScale;
     }
 
     void SpawnNextCar()
@@ -111,7 +173,7 @@ public class CarSpawnManager : MonoBehaviour
         int freeSpawner = GetFreeSpawner();
         if (freeSpawner == -1) return;
 
-        int freeCar = GetFreeCar();
+        int freeCar = GetNextFreeCar();
         if (freeCar == -1) return;
 
         carSpawnerIndex[freeCar] = freeSpawner;
@@ -123,16 +185,36 @@ public class CarSpawnManager : MonoBehaviour
         car.SetActive(true);
         spawnedCount++;
 
+        // Smoothly grow BGHouses toward the target scale for this spawn count
+        float t = (float)spawnedCount / (float)totalCarsToSpawn;
+        Vector3 targetScale = Vector3.Lerp(bgHousesStartScale, bgHousesEndScale, t);
+        SmoothBGHousesToScale(targetScale);
+
         ObstacleMover mover = car.GetComponent<ObstacleMover>();
         mover.startSpawner      = start;
         mover.endSpawner        = end;
         mover.playerObject      = playerObject;
-        mover.pImage            = pImage;           // pass PImage
+        mover.playerCPoints     = playerCPoints;
         mover.gameOverPanel     = gameOverPanel;
-        mover.crashEffect       = crashEffect;      // pass CRASH sprite
+        mover.crashEffect       = crashEffect;
         mover.onCarFinished     = () => OnCarFinished(freeCar);
         mover.onCarPassedPlayer = () => OnCarPassedPlayer();
         mover.ResetCar();
+    }
+
+    int GetNextFreeCar()
+    {
+        int total = cars.Length;
+        for (int i = 0; i < total; i++)
+        {
+            int index = (nextCarIndex + i) % total;
+            if (!cars[index].activeSelf)
+            {
+                nextCarIndex = (index + 1) % total;
+                return index;
+            }
+        }
+        return -1;
     }
 
     void OnCarFinished(int carIndex)
@@ -162,26 +244,51 @@ public class CarSpawnManager : MonoBehaviour
                 line.SetActive(false);
         }
 
-        if (finishLineObject != null)
-            finishLineObject.SetActive(true);
-
         LaneController lane = playerObject.GetComponent<LaneController>();
         if (lane != null)
             lane.enabled = false;
 
-        StartCoroutine(WinSequence());
+        if (finishLineMover != null)
+        {
+            finishLineMover.SetActive(true);
+
+            FinishLineMover flMover = finishLineMover.GetComponent<FinishLineMover>();
+            if (flMover != null)
+            {
+                flMover.ResetFinishLine();
+
+                flMover.onFinishLineReachedEnd = () =>
+                {
+                    flMover.onFinishLineReachedEnd = null;
+
+                    if (finishLineObject != null)
+                        finishLineObject.SetActive(true);
+
+                    StartCoroutine(MovePlayerToFinish());
+                };
+            }
+            else
+            {
+                if (finishLineObject != null)
+                    finishLineObject.SetActive(true);
+                StartCoroutine(MovePlayerToFinish());
+            }
+        }
+        else
+        {
+            if (finishLineObject != null)
+                finishLineObject.SetActive(true);
+            StartCoroutine(MovePlayerToFinish());
+        }
     }
 
-    IEnumerator WinSequence()
+    IEnumerator MovePlayerToFinish()
     {
         yield return null;
 
         Vector3 startPos   = playerObject.position;
         Vector3 targetPos  = finishLineTarget.position;
         Vector3 startScale = playerObject.localScale;
-
-        Debug.Log("Player start pos: " + startPos);
-        Debug.Log("Target finish pos: " + targetPos);
 
         float progress = 0f;
 
@@ -198,7 +305,7 @@ public class CarSpawnManager : MonoBehaviour
 
         Debug.Log("Player reached finish line!");
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(youWinDelay);
 
         if (youWinPanel != null)
             youWinPanel.SetActive(true);
@@ -222,16 +329,6 @@ public class CarSpawnManager : MonoBehaviour
             if (!busySpawners[random])
                 return random;
             attempts++;
-        }
-        return -1;
-    }
-
-    int GetFreeCar()
-    {
-        for (int i = 0; i < cars.Length; i++)
-        {
-            if (!cars[i].activeSelf)
-                return i;
         }
         return -1;
     }
