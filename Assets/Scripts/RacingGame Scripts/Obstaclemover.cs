@@ -20,12 +20,18 @@ public class ObstacleMover : MonoBehaviour
     public float collisionDistanceX = 200f;
     public float collisionDistanceY = 300f;
 
+    [Header("Camera Shake")]
+    public RectTransform shakeTarget;  // Assign your Camera or Canvas RectTransform
+    public float shakeDuration  = 0.5f;
+    public float shakeMagnitude = 30f;
+
     [HideInInspector] public RectTransform playerObject;
     [HideInInspector] public List<RectTransform> playerCPoints;
     [HideInInspector] public GameObject gameOverPanel;
     [HideInInspector] public GameObject crashEffect;
     [HideInInspector] public Action onCarFinished;
     [HideInInspector] public Action onCarPassedPlayer;
+    [HideInInspector] public Action onGameOver;
 
     private RectTransform rectTransform;
     private List<RectTransform> carCPoints = new List<RectTransform>();
@@ -126,7 +132,49 @@ public class ObstacleMover : MonoBehaviour
     {
         if (isGameOver) return;
         isGameOver = true;
+
+        onGameOver?.Invoke();
+
+        // Stop ImageAnimator and TractorVibration on player
+        if (playerObject != null)
+        {
+            ImageAnimator[] animators = playerObject.GetComponentsInChildren<ImageAnimator>(true);
+            foreach (ImageAnimator anim in animators)
+                anim.Stop();
+
+            TractorVibration[] vibrations = playerObject.GetComponentsInChildren<TractorVibration>(true);
+            foreach (TractorVibration vib in vibrations)
+                vib.StopEngine();
+        }
+
+        // Camera shake
+        if (shakeTarget != null)
+            StartCoroutine(CameraShake());
+
         StartCoroutine(ShowCrashThenGameOver(crashPos));
+    }
+
+    IEnumerator CameraShake()
+    {
+        Vector3 originalPos = shakeTarget.localPosition;
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            float x = UnityEngine.Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = UnityEngine.Random.Range(-1f, 1f) * shakeMagnitude;
+
+            shakeTarget.localPosition = new Vector3(
+                originalPos.x + x,
+                originalPos.y + y,
+                originalPos.z
+            );
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        shakeTarget.localPosition = originalPos;
     }
 
     IEnumerator ShowCrashThenGameOver(Vector3 crashPos)
@@ -141,6 +189,16 @@ public class ObstacleMover : MonoBehaviour
 
             crashEffect.SetActive(true);
         }
+
+        // Pause all ImageAnimator, TractorVibration, and TireLineMover scripts instantly
+        foreach (ImageAnimator anim in FindObjectsOfType<ImageAnimator>(true))
+            anim.enabled = false;
+
+        foreach (TractorVibration vib in FindObjectsOfType<TractorVibration>(true))
+            vib.enabled = false;
+
+        foreach (TireLineMover tire in FindObjectsOfType<TireLineMover>(true))
+            tire.enabled = false;
 
         yield return new WaitForSecondsRealtime(2f);
 

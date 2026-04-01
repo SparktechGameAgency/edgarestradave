@@ -40,7 +40,12 @@ public class CarSpawnManager : MonoBehaviour
     public RectTransform bgHouses;
     public Vector3 bgHousesStartScale  = new Vector3(0.1f, 0.1f, 0.1f);
     public Vector3 bgHousesEndScale    = new Vector3(1f, 1f, 1f);
-    public float bgHousesSmoothSpeed   = 2f; // Higher = faster smooth transition
+    public float bgHousesSmoothSpeed   = 2f;
+
+    [Header("Trees")]
+    public RectTransform[] treeObjects;    // Drag your tree RectTransforms here
+    public RectTransform treeStartPoint;   // Start point (e.g. right side)
+    public RectTransform treeEndPoint;     // End point (e.g. left side)
 
     [Header("Position UI")]
     public TextMeshProUGUI positionText;
@@ -56,7 +61,6 @@ public class CarSpawnManager : MonoBehaviour
     private int nextCarIndex = 0;
 
     private List<RectTransform> playerCPoints = new List<RectTransform>();
-
     private Coroutine bgHousesCoroutine;
 
     void Start()
@@ -81,10 +85,30 @@ public class CarSpawnManager : MonoBehaviour
             crashEffect.SetActive(false);
 
         if (bgHouses != null)
+        {
             bgHouses.localScale = bgHousesStartScale;
+            SmoothBGHousesToScale(bgHousesEndScale);
+        }
 
+        InitTrees();
         CollectPlayerCPoints();
         UpdatePositionText();
+    }
+
+    void InitTrees()
+    {
+        if (treeObjects == null) return;
+        foreach (RectTransform tree in treeObjects)
+        {
+            if (tree == null) continue;
+            TreeMover mover = tree.GetComponent<TreeMover>();
+            if (mover != null)
+            {
+                mover.startPoint = treeStartPoint;
+                mover.endPoint   = treeEndPoint;
+                mover.enabled    = true;
+            }
+        }
     }
 
     void CollectPlayerCPoints()
@@ -185,11 +209,6 @@ public class CarSpawnManager : MonoBehaviour
         car.SetActive(true);
         spawnedCount++;
 
-        // Smoothly grow BGHouses toward the target scale for this spawn count
-        float t = (float)spawnedCount / (float)totalCarsToSpawn;
-        Vector3 targetScale = Vector3.Lerp(bgHousesStartScale, bgHousesEndScale, t);
-        SmoothBGHousesToScale(targetScale);
-
         ObstacleMover mover = car.GetComponent<ObstacleMover>();
         mover.startSpawner      = start;
         mover.endSpawner        = end;
@@ -199,6 +218,7 @@ public class CarSpawnManager : MonoBehaviour
         mover.crashEffect       = crashEffect;
         mover.onCarFinished     = () => OnCarFinished(freeCar);
         mover.onCarPassedPlayer = () => OnCarPassedPlayer();
+        mover.onGameOver         = () => OnGameOver();
         mover.ResetCar();
     }
 
@@ -234,6 +254,25 @@ public class CarSpawnManager : MonoBehaviour
         }
     }
 
+    void OnGameOver()
+    {
+        // Stop BGHouses grow coroutine instantly
+        if (bgHousesCoroutine != null)
+        {
+            StopCoroutine(bgHousesCoroutine);
+            bgHousesCoroutine = null;
+        }
+
+        // Pause all trees
+        foreach (TreeMover tree in FindObjectsOfType<TreeMover>(true))
+            tree.PauseTree();
+    }
+
+    public void SetGameOver()
+    {
+        isGameOver = true;
+    }
+
     void StartWinSequence()
     {
         Debug.Log("StartWinSequence called!");
@@ -243,6 +282,14 @@ public class CarSpawnManager : MonoBehaviour
             if (line != null)
                 line.SetActive(false);
         }
+
+        // Pause all TireLineMover scripts on win
+        foreach (TireLineMover tire in FindObjectsOfType<TireLineMover>(true))
+            tire.enabled = false;
+
+        // Pause all trees on win
+        foreach (TreeMover tree in FindObjectsOfType<TreeMover>(true))
+            tree.PauseTree();
 
         LaneController lane = playerObject.GetComponent<LaneController>();
         if (lane != null)
@@ -331,10 +378,5 @@ public class CarSpawnManager : MonoBehaviour
             attempts++;
         }
         return -1;
-    }
-
-    public void SetGameOver()
-    {
-        isGameOver = true;
     }
 }

@@ -14,6 +14,10 @@ public class TireLineMover : MonoBehaviour
     [Header("Speed")]
     public float speed = 0.3f;
 
+    [Header("Spawn Rate")]
+    [Tooltip("Delay before this tire loops back. Lower = faster rapid fire.")]
+    public float spawnInterval = 0.3f;
+
     [HideInInspector] public Action onTirePassedPlayer;
 
     private RectTransform rectTransform;
@@ -27,7 +31,6 @@ public class TireLineMover : MonoBehaviour
 
     void OnEnable()
     {
-        // Reset and start moving as soon as object is enabled
         progress        = 0f;
         hasPassedPlayer = false;
 
@@ -39,7 +42,6 @@ public class TireLineMover : MonoBehaviour
     {
         enabled = false;
 
-        // Reset back to start so it's hidden/ready for next time
         rectTransform.position   = startSpawner.position;
         rectTransform.localScale = startScaleXYZ;
     }
@@ -62,8 +64,9 @@ public class TireLineMover : MonoBehaviour
 
         if (progress >= 1f)
         {
-            // Reset back to start — loops forever, no delay, no prefab
-            progress        = 0f;
+            // Use spawnInterval to create a gap before re-entering
+            // Negative progress = waiting off-screen before starting again
+            progress        = -(spawnInterval * speed);
             hasPassedPlayer = false;
 
             rectTransform.position   = startSpawner.position;

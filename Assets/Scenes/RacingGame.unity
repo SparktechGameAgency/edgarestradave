@@ -785,6 +785,9 @@ MonoBehaviour:
   speed: 0.1
   collisionDistanceX: 50
   collisionDistanceY: 50
+  shakeTarget: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 30
   playerObject: {fileID: 0}
   playerCPoints: []
   gameOverPanel: {fileID: 1097604664}
@@ -1475,6 +1478,9 @@ MonoBehaviour:
   speed: 0.1
   collisionDistanceX: 50
   collisionDistanceY: 50
+  shakeTarget: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 30
   playerObject: {fileID: 0}
   playerCPoints: []
   gameOverPanel: {fileID: 1097604664}
@@ -3061,7 +3067,6 @@ RectTransform:
   - {fileID: 1437150505}
   - {fileID: 24189854}
   - {fileID: 1738049129}
-  - {fileID: 2035914124}
   m_Father: {fileID: 1686300898}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3318,7 +3323,7 @@ MonoBehaviour:
   - {fileID: 995465660}
   - {fileID: 245620338}
   - {fileID: 1854082490}
-  spawnInterval: 5
+  spawnInterval: 10
   totalCarsToSpawn: 5
   playerObject: {fileID: 890710599}
   gameOverPanel: {fileID: 1097604664}
@@ -3330,13 +3335,16 @@ MonoBehaviour:
   finishLineMover: {fileID: 805774210}
   finishLineTarget: {fileID: 1426831665}
   youWinPanel: {fileID: 2105565749}
-  moveToFinishSpeed: 1
+  moveToFinishSpeed: 2
   playerEndScale: {x: 0.15, y: 0.28, z: 0}
   youWinDelay: 1.5
   bgHouses: {fileID: 1965909539}
   bgHousesStartScale: {x: 8, y: 4, z: 0}
   bgHousesEndScale: {x: 20, y: 11, z: 2}
-  bgHousesSmoothSpeed: 2
+  bgHousesSmoothSpeed: 0.015
+  treeObjects: []
+  treeStartPoint: {fileID: 0}
+  treeEndPoint: {fileID: 0}
   positionText: {fileID: 366375406}
 --- !u!1 &640043719
 GameObject:
@@ -3609,6 +3617,9 @@ MonoBehaviour:
   speed: 0.1
   collisionDistanceX: 50
   collisionDistanceY: 50
+  shakeTarget: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 30
   playerObject: {fileID: 0}
   playerCPoints: []
   gameOverPanel: {fileID: 1097604664}
@@ -3873,6 +3884,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 707775766}
   m_CullTransparentMesh: 1
+--- !u!1 &719078722
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 719078723}
+  m_Layer: 0
+  m_Name: BG_T1(1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &719078723
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719078722}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1851158854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -218.3, y: 231}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &725759049
 GameObject:
   m_ObjectHideFlags: 0
@@ -3932,6 +3978,9 @@ MonoBehaviour:
   speed: 0.1
   collisionDistanceX: 50
   collisionDistanceY: 50
+  shakeTarget: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 30
   playerObject: {fileID: 0}
   playerCPoints: []
   gameOverPanel: {fileID: 1097604664}
@@ -4233,6 +4282,7 @@ GameObject:
   - component: {fileID: 903126511}
   - component: {fileID: 903126513}
   - component: {fileID: 903126512}
+  - component: {fileID: 903126514}
   m_Layer: 0
   m_Name: BGtrees (1)
   m_TagString: Untagged
@@ -4256,7 +4306,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -735, y: 201}
+  m_AnchoredPosition: {x: -735, y: 261}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &903126512
@@ -4297,6 +4347,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 903126510}
   m_CullTransparentMesh: 1
+--- !u!114 &903126514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903126510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7209bbc8ceb51448bba63ef7a0744d92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreeMover
+  startPoint: {fileID: 719078723}
+  endPoint: {fileID: 1650250149}
+  speed: 0.015
+  loopInterval: 0.5
 --- !u!1 &918094035
 GameObject:
   m_ObjectHideFlags: 0
@@ -4308,6 +4374,7 @@ GameObject:
   - component: {fileID: 918094036}
   - component: {fileID: 918094038}
   - component: {fileID: 918094037}
+  - component: {fileID: 918094039}
   m_Layer: 0
   m_Name: BGtrees
   m_TagString: Untagged
@@ -4331,7 +4398,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 738, y: 126}
+  m_AnchoredPosition: {x: 738, y: 176}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &918094037
@@ -4372,6 +4439,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918094035}
   m_CullTransparentMesh: 1
+--- !u!114 &918094039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918094035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7209bbc8ceb51448bba63ef7a0744d92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreeMover
+  startPoint: {fileID: 1286155790}
+  endPoint: {fileID: 1027436228}
+  speed: 0.015
+  loopInterval: 0.5
 --- !u!1 &936599035
 GameObject:
   m_ObjectHideFlags: 0
@@ -5115,6 +5198,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1016465686}
   m_CullTransparentMesh: 1
+--- !u!1 &1027436227
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1027436228}
+  m_Layer: 0
+  m_Name: BG_T2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1027436228
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027436227}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1851158854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 297.6, y: 277}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1031535349
 GameObject:
   m_ObjectHideFlags: 0
@@ -5879,6 +5997,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1283459542}
   m_CullTransparentMesh: 1
+--- !u!1 &1286155789
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1286155790}
+  m_Layer: 0
+  m_Name: BG_T1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1286155790
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286155789}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1851158854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 218.2, y: 190}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1333464121
 GameObject:
   m_ObjectHideFlags: 0
@@ -7673,6 +7826,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1567434365}
   m_CullTransparentMesh: 1
+--- !u!1 &1650250148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1650250149}
+  m_Layer: 0
+  m_Name: BG_T1(2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1650250149
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650250148}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1851158854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -303.6, y: 307}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1665551424
 GameObject:
   m_ObjectHideFlags: 0
@@ -8227,6 +8415,9 @@ MonoBehaviour:
   speed: 0.1
   collisionDistanceX: 50
   collisionDistanceY: 50
+  shakeTarget: {fileID: 0}
+  shakeDuration: 0.5
+  shakeMagnitude: 30
   playerObject: {fileID: 0}
   playerCPoints: []
   gameOverPanel: {fileID: 1097604664}
@@ -8924,6 +9115,10 @@ RectTransform:
   - {fileID: 653889590}
   - {fileID: 1092217499}
   - {fileID: 1236003026}
+  - {fileID: 1286155790}
+  - {fileID: 1027436228}
+  - {fileID: 719078723}
+  - {fileID: 1650250149}
   - {fileID: 202039938}
   - {fileID: 1280934335}
   - {fileID: 108390675}
@@ -8932,6 +9127,7 @@ RectTransform:
   - {fileID: 1854082490}
   - {fileID: 626020276}
   - {fileID: 890710599}
+  - {fileID: 2035914124}
   m_Father: {fileID: 583811887}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9578,7 +9774,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2035914124
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9586,16 +9782,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2035914123}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 21.396004, y: 7.1244125, z: 7.9384}
+  m_LocalScale: {x: 6.387904, y: 4.5192857, z: 7.9384}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 583811887}
+  m_Father: {fileID: 1851158854}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -10, y: -303}
+  m_AnchoredPosition: {x: -2.9855752, y: -65.33681}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2035914125
@@ -9650,9 +9846,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TireLineMover
   startSpawner: {fileID: 1092217499}
   endSpawner: {fileID: 1236003026}
-  startScaleXYZ: {x: 6, y: 2, z: 0}
-  endScaleXYZ: {x: 50, y: 15, z: 0}
-  speed: 0.3
+  startScaleXYZ: {x: 2, y: 1.2, z: 0}
+  endScaleXYZ: {x: 20, y: 12, z: 0}
+  speed: 0.2
+  spawnInterval: 1
 --- !u!1 &2105565749
 GameObject:
   m_ObjectHideFlags: 0
