@@ -1,274 +1,641 @@
-﻿//using System.Collections;
+﻿//////using System.Collections;
+//////using UnityEngine;
+//////using UnityEngine.EventSystems;
+//////using UnityEngine.UI;
+
+//////// ══════════════════════════════════════════════════════════════════════════════
+//////// DraggableTool.cs
+//////// Attach this to: Broom, Hammer, Brush, Shovel  (the toolbar icons)
+////////
+//////// INSPECTOR FIELDS:
+////////   toolID          → a number you choose: 1=Broom 2=Hammer 3=Brush 4=Shovel
+////////   rootCanvas      → drag your Canvas here
+////////   toolAnimation   → the scene GameObject that shows the tool animating
+////////                     (e.g. the Broom swinging in the scene)
+////////                     needs a legacy Animation component — starts INACTIVE
+////////   toolClipName    → exact name of the clip on toolAnimation
+////////
+//////// BEHAVIOUR:
+////////   • Drop on a matching ToolDropZone  → zone cleaning sequence runs,
+////////     tool loops while zone animates, then both stop and tool returns to bar.
+////////   • Drop ANYWHERE else               → tool animation plays ONCE,
+////////     then icon snaps back to the bar, ready to use again.
+//////// ══════════════════════════════════════════════════════════════════════════════
+
+//////[RequireComponent(typeof(Image))]
+//////[RequireComponent(typeof(CanvasGroup))]
+//////public class DraggableTool : MonoBehaviour,
+//////    IBeginDragHandler, IDragHandler, IEndDragHandler,
+//////    IPointerEnterHandler, IPointerExitHandler
+//////{
+//////    [Header("Identity")]
+//////    [Tooltip("Give each tool a unique number. e.g. 1=Broom 2=Hammer 3=Brush 4=Shovel")]
+//////    public int toolID;
+
+//////    [Header("References")]
+//////    public Canvas rootCanvas;
+
+//////    [Header("Tool Scene Animation")]
+//////    [Tooltip("The scene GameObject with a legacy Animation component.\nMust start INACTIVE.")]
+//////    public GameObject toolAnimation;
+
+//////    [Tooltip("Exact clip name on the Animation component above.")]
+//////    public string toolClipName;
+
+//////    // ── internals ─────────────────────────────────────────────────────────
+//////    private RectTransform _rect;
+//////    private CanvasGroup _cg;
+
+//////    private Vector2 _homePos;
+//////    private Transform _homeParent;
+//////    private int _homeSibling;
+
+//////    // isAnimating is read by ToolDropZone too (HideInInspector keeps it out of Inspector clutter)
+//////    [HideInInspector] public bool isAnimating = false;
+//////    private bool _isDragging = false;
+
+//////    // ─────────────────────────────────────────────────────────────────────
+//////    void Awake()
+//////    {
+//////        _rect = GetComponent<RectTransform>();
+//////        _cg = GetComponent<CanvasGroup>();
+
+//////        if (rootCanvas == null)
+//////            rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
+//////    }
+
+//////    void Start()
+//////    {
+//////        _homePos = _rect.anchoredPosition;
+//////        _homeParent = transform.parent;
+//////        _homeSibling = transform.GetSiblingIndex();
+
+//////        // Hide scene tool at start — shown only while animating
+//////        if (toolAnimation != null)
+//////            toolAnimation.SetActive(false);
+//////    }
+
+//////    // ── Hover highlight ───────────────────────────────────────────────────
+//////    public void OnPointerEnter(PointerEventData _)
+//////    {
+//////        if (isAnimating || _isDragging) return;
+//////        transform.localScale = Vector3.one * 1.1f;
+//////    }
+
+//////    public void OnPointerExit(PointerEventData _)
+//////    {
+//////        if (_isDragging) return;
+//////        transform.localScale = Vector3.one;
+//////    }
+
+//////    // ── Drag ──────────────────────────────────────────────────────────────
+//////    public void OnBeginDrag(PointerEventData e)
+//////    {
+//////        if (isAnimating) return;   // block drag while playing
+
+//////        _isDragging = true;
+//////        transform.localScale = Vector3.one;
+
+//////        // Move to top of canvas so it renders above everything else
+//////        transform.SetParent(rootCanvas.transform, true);
+//////        _cg.alpha = 0.85f;
+//////        _cg.blocksRaycasts = false;   // lets pointer hit drop zones beneath
+
+//////        // Light up matching drop zones
+//////        ToolDropZone.ShowHints(toolID, true);
+//////    }
+
+//////    public void OnDrag(PointerEventData e)
+//////    {
+//////        if (!_isDragging) return;
+//////        _rect.anchoredPosition += e.delta / rootCanvas.scaleFactor;
+//////    }
+
+//////    public void OnEndDrag(PointerEventData e)
+//////    {
+//////        if (!_isDragging) return;
+//////        _isDragging = false;
+
+//////        ToolDropZone.ShowHints(toolID, false);
+//////        _cg.blocksRaycasts = true;
+
+//////        // ── KEY FIX ──────────────────────────────────────────────────────
+//////        // If a ToolDropZone already claimed this drop it will have called
+//////        // PlayToolAnim() which sets isAnimating = true before OnEndDrag runs.
+//////        // In that case we do nothing here — the zone's RunSequence owns the
+//////        // lifecycle.
+//////        //
+//////        // If isAnimating is still false nobody claimed the drop, so we play
+//////        // the tool animation ONCE ourselves and then return to the bar.
+//////        // ─────────────────────────────────────────────────────────────────
+//////        if (!isAnimating)
+//////            StartCoroutine(PlayOnceAndReturn());
+//////    }
+
+//////    // ── Called by ToolDropZone on a CORRECT drop ─────────────────────────
+//////    // Loops the tool animation while the zone's cleaning animation plays.
+//////    public void PlayToolAnim()
+//////    {
+//////        isAnimating = true;
+
+//////        // Put icon back in toolbar, dim it while busy
+//////        ReturnHome();
+//////        _cg.alpha = 0.4f;
+//////        _cg.interactable = false;
+//////        _cg.blocksRaycasts = false;
+//////        transform.localScale = Vector3.one;
+
+//////        if (toolAnimation != null)
+//////        {
+//////            toolAnimation.SetActive(true);
+//////            Animation anim = toolAnimation.GetComponent<Animation>();
+//////            if (anim != null && !string.IsNullOrEmpty(toolClipName))
+//////            {
+//////                anim[toolClipName].wrapMode = WrapMode.Loop;
+//////                anim.Play(toolClipName);
+//////            }
+//////        }
+//////    }
+
+//////    // ── Called by ToolDropZone when its zone animation finishes ──────────
+//////    // Stops the looping tool animation and fully restores the icon.
+//////    public void StopToolAnim()
+//////    {
+//////        isAnimating = false;
+
+//////        if (toolAnimation != null)
+//////        {
+//////            Animation anim = toolAnimation.GetComponent<Animation>();
+//////            if (anim != null) anim.Stop();
+//////            toolAnimation.SetActive(false);
+//////        }
+
+//////        // Fully restore — player can pick it up again
+//////        _cg.alpha = 1f;
+//////        _cg.interactable = true;
+//////        _cg.blocksRaycasts = true;
+//////        transform.localScale = Vector3.one;
+//////    }
+
+//////    // ── Plays animation ONCE then returns icon to bar ─────────────────────
+//////    // Used when the tool is dropped somewhere that is NOT a ToolDropZone.
+//////    IEnumerator PlayOnceAndReturn()
+//////    {
+//////        isAnimating = true;
+
+//////        // Snap icon back to toolbar and dim it while animating
+//////        ReturnHome();
+//////        _cg.alpha = 0.4f;
+//////        _cg.interactable = false;
+//////        _cg.blocksRaycasts = false;
+//////        transform.localScale = Vector3.one;
+
+//////        float clipLength = 0f;
+
+//////        if (toolAnimation != null)
+//////        {
+//////            toolAnimation.SetActive(true);
+//////            Animation anim = toolAnimation.GetComponent<Animation>();
+
+//////            if (anim != null && !string.IsNullOrEmpty(toolClipName))
+//////            {
+//////                AnimationClip clip = anim.GetClip(toolClipName);
+//////                if (clip != null) clipLength = clip.length;
+
+//////                anim[toolClipName].wrapMode = WrapMode.Once;
+//////                anim.Play(toolClipName);
+//////            }
+//////        }
+
+//////        // Wait for the full animation to finish
+//////        yield return new WaitForSeconds(clipLength);
+
+//////        // Hide tool scene object
+//////        if (toolAnimation != null)
+//////        {
+//////            Animation anim = toolAnimation.GetComponent<Animation>();
+//////            if (anim != null) anim.Stop();
+//////            toolAnimation.SetActive(false);
+//////        }
+
+//////        // Restore icon fully — ready to use again
+//////        isAnimating = false;
+//////        _cg.alpha = 1f;
+//////        _cg.interactable = true;
+//////        _cg.blocksRaycasts = true;
+//////        transform.localScale = Vector3.one;
+//////    }
+
+//////    // ── Reset (called by GameManager "Play Again") ────────────────────────
+//////    public void ResetTool()
+//////    {
+//////        StopAllCoroutines();
+//////        isAnimating = false;
+//////        _isDragging = false;
+
+//////        if (toolAnimation != null)
+//////        {
+//////            Animation anim = toolAnimation.GetComponent<Animation>();
+//////            if (anim != null) anim.Stop();
+//////            toolAnimation.SetActive(false);
+//////        }
+
+//////        ReturnHome();
+//////        _cg.alpha = 1f;
+//////        _cg.interactable = true;
+//////        _cg.blocksRaycasts = true;
+//////        transform.localScale = Vector3.one;
+//////    }
+
+//////    // ── Helpers ───────────────────────────────────────────────────────────
+//////    void ReturnHome()
+//////    {
+//////        transform.SetParent(_homeParent, true);
+//////        transform.SetSiblingIndex(_homeSibling);
+//////        _rect.anchoredPosition = _homePos;
+//////    }
+//////}
+
+////using System.Collections;
+////using UnityEngine;
+////using UnityEngine.EventSystems;
+////using UnityEngine.UI;
+
+////// ══════════════════════════════════════════════════════════════════════════════
+////// DraggableTool.cs
+//////
+////// Attach to each toolbar tool (Hammer, Broom, Brush, Shovel).
+////// The Animation component must also be on THIS same GameObject.
+//////
+////// INSPECTOR FIELDS:
+//////   toolID       → unique number per tool  (1=Broom, 2=Hammer, 3=Brush, 4=Shovel)
+//////   rootCanvas   → drag your root Canvas here
+//////   clipName     → exact name of the animation clip on this GameObject
+//////
+////// BEHAVIOUR:
+//////   Drag tool → drop anywhere → animation plays once → icon returns to bar.
+//////   Drop on a matching ToolDropZone → zone cleaning also runs at the same time.
+////// ══════════════════════════════════════════════════════════════════════════════
+
+////[RequireComponent(typeof(Image))]
+////[RequireComponent(typeof(CanvasGroup))]
+////public class DraggableTool : MonoBehaviour,
+////    IBeginDragHandler, IDragHandler, IEndDragHandler,
+////    IPointerEnterHandler, IPointerExitHandler
+////{
+////    [Header("Identity")]
+////    public int toolID;
+
+////    [Header("References")]
+////    public Canvas rootCanvas;
+
+////    [Header("Animation")]
+////    [Tooltip("Exact name of the animation clip on THIS GameObject's Animation component.")]
+////    public string clipName;
+
+////    // ── private ───────────────────────────────────────────────────────────
+////    private RectTransform _rect;
+////    private CanvasGroup _cg;
+////    private Animation _anim;
+
+////    private Vector2 _homePos;
+////    private Transform _homeParent;
+////    private int _homeSibling;
+
+////    [HideInInspector] public bool isAnimating = false;
+////    private bool _isDragging = false;
+
+////    // ─────────────────────────────────────────────────────────────────────
+////    void Awake()
+////    {
+////        _rect = GetComponent<RectTransform>();
+////        _cg = GetComponent<CanvasGroup>();
+////        _anim = GetComponent<Animation>();   // Animation lives on this same object
+////    }
+
+////    void Start()
+////    {
+////        _homePos = _rect.anchoredPosition;
+////        _homeParent = transform.parent;
+////        _homeSibling = transform.GetSiblingIndex();
+////    }
+
+////    // ── Hover ─────────────────────────────────────────────────────────────
+////    public void OnPointerEnter(PointerEventData _)
+////    {
+////        if (isAnimating || _isDragging) return;
+////        transform.localScale = Vector3.one * 1.1f;
+////    }
+
+////    public void OnPointerExit(PointerEventData _)
+////    {
+////        if (_isDragging) return;
+////        transform.localScale = Vector3.one;
+////    }
+
+////    // ── Drag ──────────────────────────────────────────────────────────────
+////    public void OnBeginDrag(PointerEventData e)
+////    {
+////        if (isAnimating) return;
+
+////        _isDragging = true;
+////        transform.localScale = Vector3.one;
+
+////        transform.SetParent(rootCanvas.transform, true);
+////        _cg.alpha = 0.85f;
+////        _cg.blocksRaycasts = false;   // so the pointer can hit drop zones underneath
+
+////        ToolDropZone.ShowHints(toolID, true);
+////    }
+
+////    public void OnDrag(PointerEventData e)
+////    {
+////        if (!_isDragging) return;
+////        _rect.anchoredPosition += e.delta / rootCanvas.scaleFactor;
+////    }
+
+////    public void OnEndDrag(PointerEventData e)
+////    {
+////        if (!_isDragging) return;
+////        _isDragging = false;
+
+////        ToolDropZone.ShowHints(toolID, false);
+////        _cg.blocksRaycasts = true;
+
+////        // Always play the animation on drop — whether it landed on a zone or not.
+////        // ToolDropZone.OnDrop calls PlayToolAnim() first (before OnEndDrag fires),
+////        // so isAnimating will already be true if a zone claimed it — we skip here
+////        // to avoid double-starting the coroutine.
+////        if (!isAnimating)
+////            StartCoroutine(PlayOnceAndReturn());
+////    }
+
+////    // ── Called by ToolDropZone on a correct drop ──────────────────────────
+////    public void PlayToolAnim()
+////    {
+////        if (isAnimating) return;
+////        StartCoroutine(PlayOnceAndReturn());
+////    }
+
+////    // ── Core routine ──────────────────────────────────────────────────────
+////    IEnumerator PlayOnceAndReturn()
+////    {
+////        isAnimating = true;
+
+////        // Snap icon back to its home slot while animating
+////        ReturnHome();
+////        _cg.alpha = 0.4f;
+////        _cg.interactable = false;
+////        _cg.blocksRaycasts = false;
+////        transform.localScale = Vector3.one;
+
+////        // Play the clip once and wait for it to finish
+////        float clipLength = 0f;
+////        if (_anim != null && !string.IsNullOrEmpty(clipName))
+////        {
+////            AnimationClip clip = _anim.GetClip(clipName);
+////            if (clip != null)
+////            {
+////                clipLength = clip.length;
+////                _anim[clipName].wrapMode = WrapMode.Once;
+////                _anim.Play(clipName);
+////            }
+////        }
+
+////        yield return new WaitForSeconds(clipLength);
+
+////        if (_anim != null) _anim.Stop();
+
+////        // Restore icon — ready to drag again
+////        isAnimating = false;
+////        _cg.alpha = 1f;
+////        _cg.interactable = true;
+////        _cg.blocksRaycasts = true;
+////        transform.localScale = Vector3.one;
+////    }
+
+////    // ── Called by ToolDropZone after zone animation finishes ──────────────
+////    // The coroutine already handles its own cleanup, so nothing extra needed.
+////    public void StopToolAnim() { }
+
+////    // ── Reset ─────────────────────────────────────────────────────────────
+////    public void ResetTool()
+////    {
+////        StopAllCoroutines();
+////        isAnimating = false;
+////        _isDragging = false;
+
+////        if (_anim != null) _anim.Stop();
+
+////        ReturnHome();
+////        _cg.alpha = 1f;
+////        _cg.interactable = true;
+////        _cg.blocksRaycasts = true;
+////        transform.localScale = Vector3.one;
+////    }
+
+////    // ── Helpers ───────────────────────────────────────────────────────────
+////    void ReturnHome()
+////    {
+////        transform.SetParent(_homeParent, true);
+////        transform.SetSiblingIndex(_homeSibling);
+////        _rect.anchoredPosition = _homePos;
+////    }
+////}
+
+//using System.Collections;
 //using UnityEngine;
 //using UnityEngine.EventSystems;
 //using UnityEngine.UI;
 
+//// ══════════════════════════════════════════════════════════════════════════════
+//// DraggableTool.cs
+////
+//// Attach to each toolbar tool (Hammer, Broom, Brush, Shovel).
+//// The legacy Animation component must be on THIS same GameObject.
+////
+//// INSPECTOR FIELDS:
+////   toolID     → unique number per tool (e.g. 1=Broom, 2=Hammer, 3=Brush, 4=Shovel)
+////   rootCanvas → drag your root Canvas here
+////   clipName   → exact name of the animation clip on this GameObject
+////
+//// BEHAVIOUR:
+////   • Drop on the MATCHING ToolDropZone → animation plays once → icon returns to bar.
+////   • Drop anywhere else (wrong zone / empty space) → snaps straight back, no animation.
+//// ══════════════════════════════════════════════════════════════════════════════
+
 //[RequireComponent(typeof(Image))]
 //[RequireComponent(typeof(CanvasGroup))]
 //public class DraggableTool : MonoBehaviour,
-//    IBeginDragHandler,
-//    IDragHandler,
-//    IEndDragHandler,
-//    IPointerEnterHandler,
-//    IPointerExitHandler
+//    IBeginDragHandler, IDragHandler, IEndDragHandler,
+//    IPointerEnterHandler, IPointerExitHandler
 //{
-//    [Header("Tool Identity")]
-//    [Tooltip("Must match the 'requiredTool' field on the correct DropZone.")]
-//    public string toolType;
+//    [Header("Identity")]
+//    public int toolID;
 
 //    [Header("References")]
 //    public Canvas rootCanvas;
 
-//    [Header("Tool Animation")]
-//    [Tooltip("Animator on the SCENE version of this tool (broom, hammer, shovel, brush).")]
-//    public Animator toolAnimator;
+//    [Header("Animation")]
+//    [Tooltip("Exact name of the clip on THIS GameObject's Animation component.")]
+//    public string clipName;
 
-//    [Tooltip("Trigger parameter name in the Animator (e.g. 'Swing').")]
-//    public string toolAnimTrigger = "Swing";
-
-//    [Header("Audio (optional)")]
-//    public AudioClip pickUpSound;
-//    public AudioClip snapBackSound;
-
-//    // ── Private state ──────────────────────────────────────────────────────
+//    // ── private ───────────────────────────────────────────────────────────
 //    private RectTransform _rect;
-//    private CanvasGroup _canvasGroup;
-//    private AudioSource _audio;
+//    private CanvasGroup _cg;
+//    private Animation _anim;
 
-//    private Vector2 _originalAnchoredPos;
-//    private Transform _originalParent;
-//    private int _originalSiblingIndex;
+//    private Vector2 _homePos;
+//    private Transform _homeParent;
+//    private int _homeSibling;
 
-//    private bool _isAnimating = false;
+//    [HideInInspector] public bool isAnimating = false;
 //    private bool _isDragging = false;
-//    private bool _isUsed = false;
 
-//    // ── GLOBAL LOCK — only one tool animates at a time ─────────────────────
-//    private static DraggableTool _currentlyAnimatingTool = null;
-
-//    // ── Unity lifecycle ────────────────────────────────────────────────────
+//    // ─────────────────────────────────────────────────────────────────────
 //    void Awake()
 //    {
 //        _rect = GetComponent<RectTransform>();
-//        _canvasGroup = GetComponent<CanvasGroup>();
-//        _audio = GetComponent<AudioSource>();
-
-//        if (rootCanvas == null)
-//            rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
+//        _cg = GetComponent<CanvasGroup>();
+//        _anim = GetComponent<Animation>();
 //    }
 
 //    void Start()
 //    {
-//        _originalAnchoredPos = _rect.anchoredPosition;
-//        _originalParent = transform.parent;
-//        _originalSiblingIndex = transform.GetSiblingIndex();
-
-//        // Hide scene tool at start — only shown while animating
-//        if (toolAnimator != null)
-//        {
-//            toolAnimator.gameObject.SetActive(false);
-//            toolAnimator.enabled = false;
-//        }
+//        _homePos = _rect.anchoredPosition;
+//        _homeParent = transform.parent;
+//        _homeSibling = transform.GetSiblingIndex();
 //    }
 
-//    // ── Hover ──────────────────────────────────────────────────────────────
+//    // ── Hover ─────────────────────────────────────────────────────────────
 //    public void OnPointerEnter(PointerEventData _)
 //    {
-//        if (_isAnimating || _isDragging || _isUsed) return;
-//        StopAllCoroutines();
-//        StartCoroutine(ScaleTo(1.15f, 0.12f));
+//        if (isAnimating || _isDragging) return;
+//        transform.localScale = Vector3.one * 1.1f;
 //    }
 
 //    public void OnPointerExit(PointerEventData _)
 //    {
 //        if (_isDragging) return;
-//        StopAllCoroutines();
-//        StartCoroutine(ScaleTo(1f, 0.1f));
+//        transform.localScale = Vector3.one;
 //    }
 
-//    // ── Drag ───────────────────────────────────────────────────────────────
-//    public void OnBeginDrag(PointerEventData eventData)
+//    // ── Drag ──────────────────────────────────────────────────────────────
+//    public void OnBeginDrag(PointerEventData e)
 //    {
-//        if (_isUsed || _isAnimating || _currentlyAnimatingTool != null) return;
+//        if (isAnimating) return;
 
 //        _isDragging = true;
-//        StopAllCoroutines();
 //        transform.localScale = Vector3.one;
 
+//        // Move to top of canvas so it renders above everything
 //        transform.SetParent(rootCanvas.transform, true);
-//        _canvasGroup.alpha = 0.85f;
-//        _canvasGroup.blocksRaycasts = false;
+//        _cg.alpha = 0.85f;
+//        _cg.blocksRaycasts = false; // lets pointer reach the drop zone underneath
 
-//        PlaySound(pickUpSound);
-//        CleaningDropZone.HighlightValidZones(toolType, true);
+//        ToolDropZone.ShowHints(toolID, true);
 //    }
 
-//    public void OnDrag(PointerEventData eventData)
+//    public void OnDrag(PointerEventData e)
 //    {
 //        if (!_isDragging) return;
-//        _rect.anchoredPosition += eventData.delta / rootCanvas.scaleFactor;
+//        _rect.anchoredPosition += e.delta / rootCanvas.scaleFactor;
 //    }
 
-//    public void OnEndDrag(PointerEventData eventData)
+//    public void OnEndDrag(PointerEventData e)
 //    {
 //        if (!_isDragging) return;
 //        _isDragging = false;
 
-//        CleaningDropZone.HighlightValidZones(toolType, false);
+//        ToolDropZone.ShowHints(toolID, false);
+//        _cg.blocksRaycasts = true;
 
-//        if (!_isAnimating && !_isUsed)
-//            SnapBack();
-
-//        _canvasGroup.blocksRaycasts = true;
+//        // If a ToolDropZone already claimed this drop it will have called
+//        // PlayToolAnim(), setting isAnimating = true before OnEndDrag fires.
+//        // In that case do nothing — the zone owns the rest of the sequence.
+//        // Otherwise snap straight back to the bar.
+//        if (!isAnimating)
+//            SnapHome();
 //    }
 
-//    // ── Called by DropZone: show scene tool and play its animation ─────────
-//    public void StartToolAnim()
+//    // ── Called by ToolDropZone when the correct tool is dropped ──────────
+//    public void PlayToolAnim()
 //    {
-//        if (_currentlyAnimatingTool != null && _currentlyAnimatingTool != this)
-//        {
-//            Debug.LogWarning($"[DraggableTool] '{name}' blocked — " +
-//                             $"'{_currentlyAnimatingTool.name}' still animating.");
-//            return;
-//        }
+//        if (isAnimating) return;
+//        StartCoroutine(PlayOnceAndReturn());
+//    }
 
-//        _currentlyAnimatingTool = this;
-//        _isAnimating = true;
+//    // ── Plays the animation once then fully restores the icon ─────────────
+//    IEnumerator PlayOnceAndReturn()
+//    {
+//        isAnimating = true;
 
-//        // Return toolbar icon to slot (greyed while animating)
-//        ReturnToParent();
-//        _rect.anchoredPosition = _originalAnchoredPos;
-//        _canvasGroup.alpha = 0.35f;
-//        _canvasGroup.interactable = false;
-//        _canvasGroup.blocksRaycasts = false;
+//        // Return icon to toolbar slot and dim it while busy
+//        ReturnHome();
+//        _cg.alpha = 0.4f;
+//        _cg.interactable = false;
+//        _cg.blocksRaycasts = false;
 //        transform.localScale = Vector3.one;
 
-//        // Show and trigger the scene tool animator
-//        if (toolAnimator != null)
+//        // Play clip once and wait for it to finish
+//        float clipLength = 0f;
+//        if (_anim != null && !string.IsNullOrEmpty(clipName))
 //        {
-//            toolAnimator.gameObject.SetActive(true);
-//            toolAnimator.enabled = true;
-
-//            if (!string.IsNullOrEmpty(toolAnimTrigger))
-//                toolAnimator.SetTrigger(toolAnimTrigger);
-
-//            Debug.Log($"[DraggableTool] ▶ '{name}' animation started (trigger: '{toolAnimTrigger}').");
-//        }
-//    }
-
-//    // ── Called by DropZone after animDuration: freeze on last frame ────────
-//    public void StopAnimAndMarkUsed()
-//    {
-//        _isAnimating = false;
-//        _isUsed = true;
-
-//        // Release global lock
-//        if (_currentlyAnimatingTool == this)
-//            _currentlyAnimatingTool = null;
-
-//        if (toolAnimator != null)
-//        {
-//            // Disable Animator WITHOUT Rebind — freezes on last frame,
-//            // then hides the broom/hammer GameObject from the scene.
-//            toolAnimator.enabled = false;
-//            toolAnimator.gameObject.SetActive(false);
-
-//            Debug.Log($"[DraggableTool] ⏹ '{name}' done — hidden.");
+//            AnimationClip clip = _anim.GetClip(clipName);
+//            if (clip != null)
+//            {
+//                clipLength = clip.length;
+//                _anim[clipName].wrapMode = WrapMode.Once;
+//                _anim.Play(clipName);
+//            }
 //        }
 
-//        // Grey out toolbar icon permanently
-//        _canvasGroup.alpha = 0.35f;
-//        _canvasGroup.interactable = false;
-//        _canvasGroup.blocksRaycasts = false;
+//        yield return new WaitForSeconds(clipLength);
+
+//        if (_anim != null) _anim.Stop();
+
+//        // Fully restore — ready to use again
+//        isAnimating = false;
+//        _cg.alpha = 1f;
+//        _cg.interactable = true;
+//        _cg.blocksRaycasts = true;
 //        transform.localScale = Vector3.one;
 //    }
 
-//    // ── Reset ──────────────────────────────────────────────────────────────
+//    // ── No-op kept so ToolDropZone.StopToolAnim() calls still compile ─────
+//    public void StopToolAnim() { }
+
+//    // ── Reset (GameManager "Play Again") ──────────────────────────────────
 //    public void ResetTool()
 //    {
 //        StopAllCoroutines();
-
-//        if (_currentlyAnimatingTool == this)
-//            _currentlyAnimatingTool = null;
-
-//        _isAnimating = false;
+//        isAnimating = false;
 //        _isDragging = false;
-//        _isUsed = false;
 
-//        // Fully reset the scene tool animator and hide it
-//        if (toolAnimator != null)
-//        {
-//            toolAnimator.gameObject.SetActive(true);
-//            toolAnimator.enabled = true;
-//            toolAnimator.Rebind();
-//            toolAnimator.Update(0f);
-//            toolAnimator.enabled = false;
-//            toolAnimator.gameObject.SetActive(false);
-//        }
+//        if (_anim != null) _anim.Stop();
 
-//        _canvasGroup.alpha = 1f;
-//        _canvasGroup.interactable = true;
-//        _canvasGroup.blocksRaycasts = true;
-
-//        ReturnToParent();
-//        _rect.anchoredPosition = _originalAnchoredPos;
+//        ReturnHome();
+//        _cg.alpha = 1f;
+//        _cg.interactable = true;
+//        _cg.blocksRaycasts = true;
 //        transform.localScale = Vector3.one;
 //    }
 
-//    // ── Helpers ────────────────────────────────────────────────────────────
-//    void SnapBack()
+//    // ── Helpers ───────────────────────────────────────────────────────────
+//    void SnapHome()
 //    {
-//        ReturnToParent();
-//        _canvasGroup.alpha = 1f;
-//        _canvasGroup.interactable = true;
-//        _canvasGroup.blocksRaycasts = true;
+//        ReturnHome();
+//        _cg.alpha = 1f;
+//        _cg.interactable = true;
+//        _cg.blocksRaycasts = true;
 //        transform.localScale = Vector3.one;
-
-//        StopAllCoroutines();
-//        StartCoroutine(MoveToPos(_originalAnchoredPos, 0.25f));
-//        PlaySound(snapBackSound);
 //    }
 
-//    void ReturnToParent()
+//    void ReturnHome()
 //    {
-//        transform.SetParent(_originalParent, true);
-//        transform.SetSiblingIndex(_originalSiblingIndex);
-//    }
-
-//    void PlaySound(AudioClip clip)
-//    {
-//        if (clip == null || _audio == null) return;
-//        _audio.PlayOneShot(clip);
-//    }
-
-//    // ── Coroutines ─────────────────────────────────────────────────────────
-//    IEnumerator ScaleTo(float target, float duration)
-//    {
-//        Vector3 start = transform.localScale;
-//        Vector3 end = Vector3.one * target;
-//        float t = 0f;
-//        while (t < 1f)
-//        {
-//            t += Time.deltaTime / duration;
-//            transform.localScale = Vector3.Lerp(start, end,
-//                                   Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t)));
-//            yield return null;
-//        }
-//        transform.localScale = end;
-//    }
-
-//    IEnumerator MoveToPos(Vector2 target, float duration)
-//    {
-//        Vector2 start = _rect.anchoredPosition;
-//        float t = 0f;
-//        while (t < 1f)
-//        {
-//            t += Time.deltaTime / duration;
-//            _rect.anchoredPosition = Vector2.Lerp(start, target,
-//                                     Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t)));
-//            yield return null;
-//        }
-//        _rect.anchoredPosition = target;
+//        transform.SetParent(_homeParent, true);
+//        transform.SetSiblingIndex(_homeSibling);
+//        _rect.anchoredPosition = _homePos;
 //    }
 //}
 
@@ -277,247 +644,243 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+// ══════════════════════════════════════════════════════════════════════════════
+// DraggableTool.cs
+//
+// Attach to each toolbar tool (Hammer, Broom, Brush, Shovel).
+// The legacy Animation component must be on THIS same GameObject.
+//
+// INSPECTOR FIELDS:
+//   toolID           → unique number per tool (e.g. 1=Broom, 2=Hammer, 3=Brush, 4=Shovel)
+//   rootCanvas       → drag your root Canvas here
+//   clipName         → exact name of the animation clip on this GameObject
+//   toolSceneAnim    → the scene GameObject that shows the tool animating
+//                      (e.g. Hammeranim, Broomanim). Needs a legacy Animation
+//                      component. Must start INACTIVE.
+//   toolSceneClipName → exact clip name on toolSceneAnim
+//
+// BEHAVIOUR:
+//   • Drop on the MATCHING ToolDropZone → BOTH the toolbar icon animation AND
+//     the scene tool animation play together while the zone cleans.
+//     When the zone finishes, both animations stop and the icon returns to the bar.
+//   • Drop anywhere else (wrong zone / empty space) → snaps straight back, no animation.
+// ══════════════════════════════════════════════════════════════════════════════
+
 [RequireComponent(typeof(Image))]
 [RequireComponent(typeof(CanvasGroup))]
 public class DraggableTool : MonoBehaviour,
-    IBeginDragHandler,
-    IDragHandler,
-    IEndDragHandler,
-    IPointerEnterHandler,
-    IPointerExitHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler,
+    IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Tool Identity")]
-    [Tooltip("Must match the 'requiredTool' field on the correct DropZone.")]
-    public string toolType;   // "broom" | "hammer" | "shovel" | "brush"
+    [Header("Identity")]
+    public int toolID;
 
     [Header("References")]
     public Canvas rootCanvas;
 
-    [Header("Tool Animation")]
-    [Tooltip("The scene GameObject that shows the tool animating (broom sweeping etc.)." +
-             " Assign its Animator here. Starts INACTIVE.")]
-    public Animator toolAnimator;
+    [Header("Toolbar Icon Animation")]
+    [Tooltip("Exact name of the clip on THIS GameObject's Animation component.")]
+    public string clipName;
 
-    [Tooltip("Trigger name inside the tool Animator (e.g. 'Clean').")]
-    public string toolAnimTrigger = "Clean";
+    [Header("Scene Tool Animation")]
+    [Tooltip("The scene GameObject that shows the tool animating (e.g. Hammeranim, Broomanim).\nNeeds a legacy Animation component. Must start INACTIVE.")]
+    public GameObject toolSceneAnim;
 
-    [Header("Audio (optional)")]
-    public AudioClip pickUpSound;
-    public AudioClip snapBackSound;
+    [Tooltip("Exact clip name on the toolSceneAnim Animation component.")]
+    public string toolSceneClipName;
 
-    // ── Private ────────────────────────────────────────────────────────────
+    // ── private ───────────────────────────────────────────────────────────
     private RectTransform _rect;
-    private CanvasGroup _canvasGroup;
-    private AudioSource _audio;
+    private CanvasGroup _cg;
+    private Animation _anim;
 
-    private Vector2 _originalAnchoredPos;
-    private Transform _originalParent;
-    private int _originalSiblingIndex;
+    private Vector2 _homePos;
+    private Transform _homeParent;
+    private int _homeSibling;
 
-    private bool _isAnimating = false;
+    [HideInInspector] public bool isAnimating = false;
     private bool _isDragging = false;
-    private bool _isUsed = false;
 
-    // ── Lifecycle ──────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────
     void Awake()
     {
         _rect = GetComponent<RectTransform>();
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _audio = GetComponent<AudioSource>();
+        _cg = GetComponent<CanvasGroup>();
+        _anim = GetComponent<Animation>();
 
-        if (rootCanvas == null)
-            rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
+        // Make sure the scene tool is hidden at start
+        if (toolSceneAnim != null)
+            toolSceneAnim.SetActive(false);
     }
 
     void Start()
     {
-        _originalAnchoredPos = _rect.anchoredPosition;
-        _originalParent = transform.parent;
-        _originalSiblingIndex = transform.GetSiblingIndex();
-
-        // Scene tool starts hidden
-        if (toolAnimator != null)
-        {
-            toolAnimator.gameObject.SetActive(false);
-            toolAnimator.enabled = false;
-        }
+        _homePos = _rect.anchoredPosition;
+        _homeParent = transform.parent;
+        _homeSibling = transform.GetSiblingIndex();
     }
 
-    // ── Hover ──────────────────────────────────────────────────────────────
+    // ── Hover ─────────────────────────────────────────────────────────────
     public void OnPointerEnter(PointerEventData _)
     {
-        if (_isAnimating || _isDragging || _isUsed) return;
-        StopAllCoroutines();
-        StartCoroutine(ScaleTo(1.15f, 0.12f));
+        if (isAnimating || _isDragging) return;
+        transform.localScale = Vector3.one * 1.1f;
     }
 
     public void OnPointerExit(PointerEventData _)
     {
         if (_isDragging) return;
-        StopAllCoroutines();
-        StartCoroutine(ScaleTo(1f, 0.1f));
+        transform.localScale = Vector3.one;
     }
 
-    // ── Drag ───────────────────────────────────────────────────────────────
-    public void OnBeginDrag(PointerEventData eventData)
+    // ── Drag ──────────────────────────────────────────────────────────────
+    public void OnBeginDrag(PointerEventData e)
     {
-        if (_isUsed || _isAnimating) return;
+        if (isAnimating) return;
 
         _isDragging = true;
-        StopAllCoroutines();
         transform.localScale = Vector3.one;
 
+        // Move to top of canvas so it renders above everything
         transform.SetParent(rootCanvas.transform, true);
-        _canvasGroup.alpha = 0.85f;
-        _canvasGroup.blocksRaycasts = false;
+        _cg.alpha = 0.85f;
+        _cg.blocksRaycasts = false; // lets pointer reach the drop zone underneath
 
-        PlaySound(pickUpSound);
-        CleaningDropZone.HighlightValidZones(toolType, true);
+        ToolDropZone.ShowHints(toolID, true);
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void OnDrag(PointerEventData e)
     {
         if (!_isDragging) return;
-        _rect.anchoredPosition += eventData.delta / rootCanvas.scaleFactor;
+        _rect.anchoredPosition += e.delta / rootCanvas.scaleFactor;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void OnEndDrag(PointerEventData e)
     {
         if (!_isDragging) return;
         _isDragging = false;
 
-        CleaningDropZone.HighlightValidZones(toolType, false);
+        ToolDropZone.ShowHints(toolID, false);
+        _cg.blocksRaycasts = true;
 
-        if (!_isAnimating && !_isUsed)
-            SnapBack();
-
-        _canvasGroup.blocksRaycasts = true;
+        // If a ToolDropZone already claimed this drop it will have called
+        // PlayToolAnim(), setting isAnimating = true before OnEndDrag fires.
+        // In that case do nothing — the zone owns the rest of the sequence.
+        // Otherwise snap straight back to the bar.
+        if (!isAnimating)
+            SnapHome();
     }
 
-    // ── Called by DropZone: show scene tool, start its animation ──────────
-    public void StartToolAnim()
+    // ── Called by ToolDropZone when the correct tool is dropped ──────────
+    // Plays BOTH the toolbar icon animation AND the scene tool animation
+    // simultaneously. The scene animation loops until StopToolAnim() is called.
+    public void PlayToolAnim()
     {
-        _isAnimating = true;
+        if (isAnimating) return;
 
-        // Return toolbar icon to its slot, grey it out while animating
-        ReturnToParent();
-        _rect.anchoredPosition = _originalAnchoredPos;
-        _canvasGroup.alpha = 0.35f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
-        transform.localScale = Vector3.one;
+        // Start the toolbar icon animation (plays once, then returns to bar)
+        StartCoroutine(PlayOnceAndReturn());
 
-        // Activate and trigger the scene tool
-        if (toolAnimator != null)
+        // Also activate and LOOP the scene tool animation at the same time
+        if (toolSceneAnim != null)
         {
-            toolAnimator.gameObject.SetActive(true);
-            toolAnimator.enabled = true;
-
-            if (!string.IsNullOrEmpty(toolAnimTrigger))
-                toolAnimator.SetTrigger(toolAnimTrigger);
+            toolSceneAnim.SetActive(true);
+            Animation sceneAnim = toolSceneAnim.GetComponent<Animation>();
+            if (sceneAnim != null && !string.IsNullOrEmpty(toolSceneClipName))
+            {
+                sceneAnim[toolSceneClipName].wrapMode = WrapMode.Loop;
+                sceneAnim.Play(toolSceneClipName);
+            }
         }
     }
 
-    // ── Called by DropZone when cleaning animation finishes ───────────────
-    // Hides the scene tool. Toolbar icon stays greyed (task is done).
-    public void HideToolAfterAnim()
+    // ── Plays the toolbar icon animation once then fully restores the icon ─
+    IEnumerator PlayOnceAndReturn()
     {
-        _isAnimating = false;
-        _isUsed = true;
+        isAnimating = true;
 
-        if (toolAnimator != null)
+        // Return icon to toolbar slot and dim it while busy
+        ReturnHome();
+        _cg.alpha = 0.4f;
+        _cg.interactable = false;
+        _cg.blocksRaycasts = false;
+        transform.localScale = Vector3.one;
+
+        // Play toolbar icon clip once and wait for it to finish
+        float clipLength = 0f;
+        if (_anim != null && !string.IsNullOrEmpty(clipName))
         {
-            toolAnimator.enabled = false;
-            toolAnimator.gameObject.SetActive(false);
+            AnimationClip clip = _anim.GetClip(clipName);
+            if (clip != null)
+            {
+                clipLength = clip.length;
+                _anim[clipName].wrapMode = WrapMode.Once;
+                _anim.Play(clipName);
+            }
         }
 
-        // Keep toolbar icon greyed permanently — task completed
-        _canvasGroup.alpha = 0.35f;
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+        yield return new WaitForSeconds(clipLength);
+
+        if (_anim != null) _anim.Stop();
+
+        // Fully restore — ready to use again
+        isAnimating = false;
+        _cg.alpha = 1f;
+        _cg.interactable = true;
+        _cg.blocksRaycasts = true;
         transform.localScale = Vector3.one;
     }
 
-    // ── Reset ──────────────────────────────────────────────────────────────
+    // ── Called by ToolDropZone when zone animation finishes ───────────────
+    // Stops the looping scene tool animation and hides it.
+    public void StopToolAnim()
+    {
+        if (toolSceneAnim != null)
+        {
+            Animation sceneAnim = toolSceneAnim.GetComponent<Animation>();
+            if (sceneAnim != null) sceneAnim.Stop();
+            toolSceneAnim.SetActive(false);
+        }
+    }
+
+    // ── Reset (GameManager "Play Again") ──────────────────────────────────
     public void ResetTool()
     {
         StopAllCoroutines();
-
-        _isAnimating = false;
+        isAnimating = false;
         _isDragging = false;
-        _isUsed = false;
 
-        if (toolAnimator != null)
+        if (_anim != null) _anim.Stop();
+
+        // Also reset scene tool animation
+        if (toolSceneAnim != null)
         {
-            toolAnimator.gameObject.SetActive(true);
-            toolAnimator.enabled = true;
-            toolAnimator.Rebind();
-            toolAnimator.Update(0f);
-            toolAnimator.enabled = false;
-            toolAnimator.gameObject.SetActive(false);
+            Animation sceneAnim = toolSceneAnim.GetComponent<Animation>();
+            if (sceneAnim != null) sceneAnim.Stop();
+            toolSceneAnim.SetActive(false);
         }
 
-        _canvasGroup.alpha = 1f;
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
-
-        ReturnToParent();
-        _rect.anchoredPosition = _originalAnchoredPos;
+        ReturnHome();
+        _cg.alpha = 1f;
+        _cg.interactable = true;
+        _cg.blocksRaycasts = true;
         transform.localScale = Vector3.one;
     }
 
-    // ── Helpers ────────────────────────────────────────────────────────────
-    void SnapBack()
+    // ── Helpers ───────────────────────────────────────────────────────────
+    void SnapHome()
     {
-        ReturnToParent();
-        _canvasGroup.alpha = 1f;
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
+        ReturnHome();
+        _cg.alpha = 1f;
+        _cg.interactable = true;
+        _cg.blocksRaycasts = true;
         transform.localScale = Vector3.one;
-
-        StopAllCoroutines();
-        StartCoroutine(MoveToPos(_originalAnchoredPos, 0.25f));
-        PlaySound(snapBackSound);
     }
 
-    void ReturnToParent()
+    void ReturnHome()
     {
-        transform.SetParent(_originalParent, true);
-        transform.SetSiblingIndex(_originalSiblingIndex);
-    }
-
-    void PlaySound(AudioClip clip)
-    {
-        if (clip == null || _audio == null) return;
-        _audio.PlayOneShot(clip);
-    }
-
-    IEnumerator ScaleTo(float target, float duration)
-    {
-        Vector3 start = transform.localScale;
-        Vector3 end = Vector3.one * target;
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / duration;
-            transform.localScale = Vector3.Lerp(start, end,
-                                   Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t)));
-            yield return null;
-        }
-        transform.localScale = end;
-    }
-
-    IEnumerator MoveToPos(Vector2 target, float duration)
-    {
-        Vector2 start = _rect.anchoredPosition;
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / duration;
-            _rect.anchoredPosition = Vector2.Lerp(start, target,
-                                     Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t)));
-            yield return null;
-        }
-        _rect.anchoredPosition = target;
+        transform.SetParent(_homeParent, true);
+        transform.SetSiblingIndex(_homeSibling);
+        _rect.anchoredPosition = _homePos;
     }
 }
