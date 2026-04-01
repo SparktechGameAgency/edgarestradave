@@ -16,7 +16,12 @@ public class TireLineMover : MonoBehaviour
 
     [Header("Spawn Rate")]
     [Tooltip("Delay before this tire loops back. Lower = faster rapid fire.")]
-    public float spawnInterval = 0.3f;
+    public float spawnInterval = 0f;
+
+    [Header("Loop Offset")]
+    [Tooltip("Stagger multiple tires. E.g. 0, 0.33, 0.66 for 3 tires evenly spaced.")]
+    [Range(0f, 1f)]
+    public float startOffset = 0f;
 
     [HideInInspector] public Action onTirePassedPlayer;
 
@@ -31,7 +36,8 @@ public class TireLineMover : MonoBehaviour
 
     void OnEnable()
     {
-        progress        = 0f;
+        // Apply offset so multiple tires are evenly spread apart
+        progress        = startOffset;
         hasPassedPlayer = false;
 
         rectTransform.position   = startSpawner.position;
