@@ -1,19 +1,13 @@
 fileFormatVersion: 2
-guid: 16026b8c341dd9c4b9e671e3f900d2d5
+guid: c2447e11025dcf64c91cbe3712937fe8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6985303992535677690
-    second: wallmate-4-1_0
+      213: -605272516815215815
+    second: Frame 645_0
   - first:
-      213: -8868499333915453340
-    second: wallmate-4-1_1
-  - first:
-      213: 6148386590506997397
-    second: wallmate-4-1_2
-  - first:
-      213: -2960102540524245005
-    second: wallmate-4-1_3
+      213: -808249531022682062
+    second: Frame 645_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -82,7 +76,7 @@ TextureImporter:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
-    resizeAlgorithm: 1
+    resizeAlgorithm: 0
     textureFormat: 4
     textureCompression: 1
     compressionQuality: 50
@@ -135,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: wallmate-4-1_0
+      name: Frame 645_0
       rect:
         serializedVersion: 2
-        x: 704
-        y: 582
-        width: 15
-        height: 104
+        x: 0
+        y: 171
+        width: 236
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,20 +144,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: afaf433b8f8c0f060800000000000000
-      internalID: 6985303992535677690
+      spriteID: 9332ce25ad3a997f0800000000000000
+      internalID: -605272516815215815
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wallmate-4-1_1
+      name: Frame 645_1
       rect:
         serializedVersion: 2
-        x: 720
-        y: 583
-        width: 74
-        height: 104
+        x: 622
+        y: 86
+        width: 235
+        height: 217
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,52 +166,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4685e27d7d2cce480800000000000000
-      internalID: -8868499333915453340
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: wallmate-4-1_2
-      rect:
-        serializedVersion: 2
-        x: 795
-        y: 584
-        width: 7
-        height: 103
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 596d1fc4705735550800000000000000
-      internalID: 6148386590506997397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: wallmate-4-1_3
-      rect:
-        serializedVersion: 2
-        x: 652
-        y: 411
-        width: 136
-        height: 138
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3ff22553c6a9be6d0800000000000000
-      internalID: -2960102540524245005
+      spriteID: 2385485755588c4f0800000000000000
+      internalID: -808249531022682062
       vertices: []
       indices: 
       edges: []
@@ -236,10 +186,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      wallmate-4-1_0: 6985303992535677690
-      wallmate-4-1_1: -8868499333915453340
-      wallmate-4-1_2: 6148386590506997397
-      wallmate-4-1_3: -2960102540524245005
+      Frame 645_0: -605272516815215815
+      Frame 645_1: -808249531022682062
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
