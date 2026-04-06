@@ -5,9 +5,6 @@ TextureImporter:
   - first:
       213: -8258447540736388509
     second: Frame 510_0
-  - first:
-      213: 6212671222619618790
-    second: Frame 510_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -106,10 +103,10 @@ TextureImporter:
       name: Frame 510_0
       rect:
         serializedVersion: 2
-        x: 206
-        y: 98
-        width: 659
-        height: 542
+        x: 827
+        y: 396
+        width: 2627
+        height: 2160
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -120,28 +117,6 @@ TextureImporter:
       bones: []
       spriteID: 362953287b9146d80800000000000000
       internalID: -8258447540736388509
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Frame 510_1
-      rect:
-        serializedVersion: 2
-        x: 776
-        y: 83
-        width: 169
-        height: 123
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6edb8829f87d73650800000000000000
-      internalID: 6212671222619618790
       vertices: []
       indices: 
       edges: []
@@ -161,7 +136,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Frame 510_0: -8258447540736388509
-      Frame 510_1: 6212671222619618790
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

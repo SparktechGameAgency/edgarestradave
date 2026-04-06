@@ -46,7 +46,7 @@ public class CornButton : MonoBehaviour, IPointerClickHandler
                 Debug.Log(gameObject.name + " placed! Notifying TutorialManager.");
 
                 if (TutorialManager.Instance != null)
-                    TutorialManager.Instance.OnCornPlaced();
+                    TutorialManager.Instance.Phase1_OnCornPlaced();
                 else
                     Debug.LogError("TutorialManager.Instance is NULL!");
             }
